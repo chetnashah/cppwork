@@ -38,7 +38,7 @@ int main(){
 }
 ```
 
-### Constructor initialization
+### Constructor (direct) initialization
 
 Constructors never return values, they simply initialize the object.
 Also need to have same name as class.
@@ -56,9 +56,10 @@ Rectangle::Rectangle (int a, int b) {
 }
 
 int main () {
+    // notice no new keyword
   // normal constructor does not new, alos allocated on stack
   Rectangle rect (3,4);
-  // also known as functional form 
+  // also known as functional form or direct initialization
   Rectangle rectb (5,6);
   cout << "rect area: " << rect.area() << endl;
   cout << "rectb area: " << rectb.area() << endl;
@@ -68,7 +69,7 @@ int main () {
 
 Like any other function, a constructor can also be overloaded with different versions taking different parameters: with a different number of parameters and/or parameters of different types. The compiler will automatically call the one whose parameters match the arguments.
 
-### Uniform initialization
+### Uniform initialization vs direct initialization
 
 #### copy constructor on assignment
 Assignment calls single argument constructor,
@@ -96,9 +97,9 @@ class Circle {
 };
 
 int main () {
-  Circle foo (10.0);   // functional form
+  Circle foo (10.0);   // functional form or direct initialization
   Circle bar = 20.0;   // assignment init.
-  Circle baz {30.0};   // uniform init.
+  Circle baz {30.0};   // uniform init or brace initialization
   Circle qux = {40.0}; // POD-like
 
   cout << "foo's circumference: " << foo.circum() << '\n';

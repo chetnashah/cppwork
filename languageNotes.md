@@ -1,4 +1,9 @@
 
+### meta variables
+
+Start and end with `__` e.g. 
+`__func__` will return you name of the current function that is running.
+
 ### One definition rule
 
 File level `ODR`: Only one definition of any variable, function, class type, enumeration type, concept (since C++20) or template is allowed in any one translation unit (file).
