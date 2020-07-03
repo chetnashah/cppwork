@@ -246,3 +246,49 @@ https://stackoverflow.com/questions/4955159/is-is-a-good-practice-to-put-the-def
 
 A function defined within a class definition is an inline function.
 
+
+### References
+https://isocpp.org/wiki/faq/references
+
+An alias (an alternate name) for an object.
+
+References are frequently used for pass-by-reference:
+
+```cpp
+void swap(int& i, int& j)
+{
+  int tmp = i;
+  i = j;
+  j = tmp;
+}
+int main()
+{
+  int x, y;
+  swap(x,y);
+}
+```
+Here i and j are aliases for main’s x and y respectively. In other words, i is x — not a pointer to x, nor a copy of x, but x itself. Anything you do to i gets done to x, and vice versa. This includes taking the address of it. The values of &i and &x are identical.
+
+#### Call by value or call by reference?
+
+That depends on what you are trying to achieve:
+
+1. If you want to change the object passed, call by reference or use a pointer; e.g., `void f(X&);` or `void f(X*);`.
+2. If you don’t want to change the object passed and it is big, call by const reference; e.g., `void f(const X&);`.
+3. Otherwise, call by value; e.g. `void f(X);`.
+What does “big” mean? Anything larger than a couple of words.
+
+Why would you want to change an argument? Well, often we have to, but often we have an alternative: produce a new value. Consider:
+```cpp
+    void incr1(int& x); // increment
+    int incr2(int x);   // increment
+    int v = 2;
+    incr1(v);   // v becomes 3
+    v = incr2(v);   // v becomes 4
+```
+For a reader, `incr2()` is likely easier to understand. That is, `incr1()` is more likely to lead to mistakes and errors. So, we should prefer the style that returns a new value over the one that modifies a value as long as the creation and copy of a new value isn’t expensive.
+
+What if you do want to change the argument, should you use a pointer or use a reference? If passing “not an object” (e.g., a null pointer) is acceptable, using a pointer makes sense. One style is to use a pointer when you want to modify an object because in some contexts that makes it easier to spot that a modification is possible.
+
+Note also that a call of a member function is essentially a call-by-reference on the object, so we often use member functions when we want to modify the value/state of an object.
+
