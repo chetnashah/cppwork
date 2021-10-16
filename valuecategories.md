@@ -171,5 +171,5 @@ MyString apple ="Apple";
 MyString a2 = std::move(apple); // move constructor called.
 
 MyString a3;
-a3 = std::move(a2); // move assignment called
+a3 = std::move(a2); // move assignment called  
 ```
