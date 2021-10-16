@@ -292,3 +292,178 @@ What if you do want to change the argument, should you use a pointer or use a re
 
 Note also that a call of a member function is essentially a call-by-reference on the object, so we often use member functions when we want to modify the value/state of an object.
 
+### references
+
+* references must always be initialized, otherwise it is a compiler error.
+
+* the construction argument for a reference has to be l-value
+e.g. 
+```cpp
+int& j { 2}; // compiler error because 2 is not a l-value
+// but an r-value can be passed to const ref
+const int& k { 3}; // ok
+```
+
+* references cannot be reassigned, once initialized they cannot serve as alias for other variables.
+
+e.g. 
+```cpp
+    int v1 = 5;
+    int v2 = 6;
+    int& r1 {v1};
+    r1 = v2;
+    std::cout << r1 << v1 << v2 << std::endl;
+
+//Instead of changing ref to reference variable v2, it assigns the value of v2 to v1
+```
+
+#### const references
+
+A reference to a const value is often called a const reference for short.
+
+YOu can declare const ref to a non-const value but not the other way:
+```cpp
+    int c1 = 2;
+    const int& cr1 { c1};// ok, cr1 considered read only reference/alias of c1
+
+    const int c2 = 3;
+    int& cr2 {c2};// compiler error because cr2 can change things
+
+    // also works with r-value in constructor
+    const int& ref3{ 6 }; // okay, 6 is an r-value
+```
+
+#### references to const initialized via r-values, extend lifetime of r-values
+
+```cpp
+int somefcn()
+{
+    const int& ref{ 2 + 3 }; // normally the result of 2+3 has expression scope and is destroyed at the end of this statement
+    // but because the result is now bound to a reference to a const value...
+    std::cout << ref << '\n'; // we can use it here
+} // and the lifetime of the r-value is extended to here, when the const reference dies
+```
+
+#### const refs as function parameters
+
+THis is same as read only reference passed to function, where function will not be able to modify.
+
+ A const reference parameter allows you to pass in a non-const l-value argument, a const l-value argument, a literal, or the result of an expression.
+
+ ```cpp
+ #include <iostream>
+
+void printIt(const int& x)
+{
+    std::cout << x;
+}
+
+int main()
+{
+    int a{ 1 };
+    printIt(a); // non-const l-value
+
+    const int b{ 2 };
+    printIt(b); // const l-value
+    printIt(3); // literal r-value
+    printIt(2+b); // expression r-value
+    return 0;
+}
+ ```
+
+### Member initializer list
+The member initializer list is inserted after the constructor parameters. It begins with a colon (:), and then lists each variable to initialize along with the value for that variable separated by a comma.
+
+Use member initializer lists to initialize your class member variables instead of assignment.
+
+
+```cpp
+class Something
+{
+private:
+    int m_value1 {};
+    double m_value2 {};
+    char m_value3 {};
+
+public:
+    Something() : m_value1{ 1 }, m_value2{ 2.2 }, m_value3{ 'c' } // Initialize our member variables
+    {
+    // No need for assignment here
+    }
+
+    void print()
+    {
+         std::cout << "Something(" << m_value1 << ", " << m_value2 << ", " << m_value3 << ")\n";
+    }
+};
+
+int main()
+{
+    Something something{};
+    something.print();
+    return 0;
+}
+```
+
+For arrays:
+```cpp
+class Something
+{
+private:
+    const int m_array[5];
+
+public:
+    Something(): m_array { 1, 2, 3, 4, 5 } // use uniform initialization to initialize our member array
+    {
+    }
+};
+```
+
+###  const initialization in classes
+
+Assignment not allowed for initialization
+```cpp
+class Something{
+    private:
+        const int j;
+    public:
+        Something(int x) {
+            j = x; // compiler error
+        }
+};
+```
+
+Correct way: **No assignment, only member initialization**
+```cpp
+class Something{
+    private:
+         const int j;
+    public:
+        Something(int x) : j { x }
+        {}
+};
+```
+
+
+### copy constructor
+
+#### default copy constructor
+
+just does a memberwise shallow copy
+
+#### providing custom copy constructor
+
+A constructor with `const ClassName& other` argument
+
+```cpp
+class Something{
+    private:
+         const int j;
+    public:
+        Something(int x) : j { x }
+        {}
+
+        Something(const Something& other): j { other.j }
+        {}
+};
+```
