@@ -1,4 +1,9 @@
 
+### new vs normal
+
+`new` allocates on heap.
+In the rest of the cases, objects are allocated on stack.
+
 ### meta variables
 
 Start and end with `__` e.g. 

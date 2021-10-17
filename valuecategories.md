@@ -159,6 +159,10 @@ move constructor (which takes in rvalue reference) will be invoked(that does the
 Write a function with argument `ClassName(ClassName&& startTemp)` and do all the 
 stealing, i.e. shallow copy and cleanup the other.
 
+Goal of move constructor should be:
+1. steal contents of other/temp into this.
+2. leave other/temp in a valid undefined state.
+
 ### How do I write my move assignment operator?
 
 Similar to move constructor, but properly empty out/cleanup the other reference, 
