@@ -23,6 +23,17 @@ Member functions or variables declared static are shared between all instances o
 
 ### initialization
 
+#### constructor types
+
+Constructors have no names and cannot be called directly. They are invoked when initialization takes place, and they are selected according to the rules of initialization. 
+1. The constructors without explicit specifier are converting constructors. 
+2. The constructors with a constexpr specifier make their type a LiteralType. 
+3. Constructors that may be called without any argument are default constructors.
+4. Constructors that take another object of the same type as the argument are copy constructors and move constructors.
+
+
+
+
 #### new & pointer (heap allocation)
 
 ```cpp
@@ -69,6 +80,74 @@ int main () {
 
 Like any other function, a constructor can also be overloaded with different versions taking different parameters: with a different number of parameters and/or parameters of different types. The compiler will automatically call the one whose parameters match the arguments.
 
+### default constructors call memberwise initializers
+
+**note** - default constructor with no args
+will conflict with a constructor with all args that have default values
+```cpp
+class Cylinder {
+    private:
+    int k {4};// memberwise initializer
+    std::string j {"jay"};// memberwise initializers
+
+    public:
+    Cylinder() = default; // no params needed
+
+    std::string getDescription(){
+        return j;
+    }
+};
+int main()
+{
+    Cylinder cc;
+    std::cout << cc.getDescription() <<std::endl;
+    return 0;
+}
+```
+
+
+
+
+### direct initailizer list initialization
+
+NOrmally other constructor initialization 
+happens via doing memberwise initialization by assignment, but this approach avoids that.
+```cpp
+Cylinder::Cylinder(double radius_param, double height_param): base_radius(radius_param), height(height_param){
+// nothing needed here
+}
+//usage
+Cylinder c(1,2);
+Cylinder c{1,6};
+```
+
+This is also valid:
+```cpp
+Cylinder::Cylinder(double radius_param, double height_param): base_radius{radius_param}, height{height_param}{
+// nothing needed here
+Cylinder c(1,2);
+Cylinder c{1,6};
+}
+```
+
+helps avoid copies in comparision to assignment initialization
+
+Prefere initializer lists over memberwise
+copy initialization(by assignment)
+
+
+### Memberwise initialization by assigment does double copies
+
+e.g.
+```cpp
+Cylinder::Cylinder(double rad_param, double height_param){
+  // here init has already happened with default memberwise values populated in "this"
+  // following assignments are copies of values that update "this" object
+  base_radius = rad_param;
+  height = height_param;
+}
+```
+
 ### Uniform initialization vs direct initialization
 
 #### copy constructor on assignment
@@ -109,6 +188,8 @@ int main () {
 
 #### Member initialization in constructors
 
+The body of a function definition of any constructor, before the opening brace of the compound statement, may include the `member initializer list`, whose syntax is the colon character `:`, followed by the comma-separated list of one or more member-initializers.
+
 When a constructor is used to initialize other members, these other members can be initialized directly, without resorting to statements in its body. This is done by inserting, before the constructor's body, a colon (:) and a list of initializations for class members.
 
 e.g.
@@ -130,6 +211,55 @@ class Cylinder {
 
 // with initializer syntax
 Cylinder::Cylinder (double r, double h) : base{r}, height{h} { }
-
 ```
 
+If a non-static data member has a default member initializer and also appears in a member initializer list, then the member initializer is used and the default member initializer is ignored:
+```cpp
+struct S {
+    int n = 42;   // default member initializer
+    S() : n(7) {} // will set n to 7, not 42
+};
+```
+
+### compiler can do implicit conversions for function calls
+
+opt out of it by following:
+```cpp
+explicit Square(double side_param)
+```
+Unlike explicit constructors, which are only considered during direct initialization (which includes explicit conversions such as static_cast), converting constructors are also considered during copy initialization
+```cpp
+struct A
+{
+    A() { }         // converting constructor (since C++11)  
+    A(int) { }      // converting constructor
+    A(int, int) { } // converting constructor (since C++11)
+};
+ 
+struct B
+{
+    explicit B() { }
+    explicit B(int) { }
+    explicit B(int, int) { }
+};
+ 
+int main()
+{
+    A a1 = 1;      // OK: copy-initialization selects A::A(int)
+    A a2(2);       // OK: direct-initialization selects A::A(int)
+    A a3{4, 5};    // OK: direct-list-initialization selects A::A(int, int)
+    A a4 = {4, 5}; // OK: copy-list-initialization selects A::A(int, int)
+    A a5 = (A)1;   // OK: explicit cast performs static_cast, direct-initialization
+ 
+//  B b1 = 1;      // error: copy-initialization does not consider B::B(int)
+    B b2(2);       // OK: direct-initialization selects B::B(int)
+    B b3{4, 5};    // OK: direct-list-initialization selects B::B(int, int)
+//  B b4 = {4, 5}; // error: copy-list-initialization selected an explicit constructor
+                   //        B::B(int, int)
+    B b5 = (B)1;   // OK: explicit cast performs static_cast, direct-initialization
+    B b6;          // OK, default-initialization
+    B b7{};        // OK, direct-list-initialization
+//  B b8 = {};     // error: copy-list-initialization selected an explicit constructor
+                   //        B::B()
+}
+```
