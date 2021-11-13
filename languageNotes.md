@@ -1,4 +1,12 @@
 
+
+### reading pointers and references
+
+When reading always refer pointers as `pointers to` and references as `references to`.
+e.g. `int *p` is `pointer to an int`
+and `int &p` is `reference to an int`.
+More details at http://faculty.cs.niu.edu/~mcmahon/CS241/Notes/reading_declarations.html
+
 ### new vs normal
 
 `new` allocates on heap.
@@ -33,6 +41,85 @@ Visual studio: it will consistently print -858993460, because that’s the value
 
 Most modern compilers will attempt to detect if a variable is being used without being given a value. If they are able to detect this, they will generally issue a compile-time error.
 
+#### Pointer initialization
+
+default brace initialization for a pointer
+is nullptr
+e.g.
+```cpp
+// both are same
+int* p1 {};
+int* p2 {nullptr};
+p1 == p2; // true
+
+// uninitialized pointer usage is a code smell
+// should have linting to prevent this
+int* p_un;
+// using p_un without assignment init will result in a runtime crash
+```
+
+#### `char *` initialization with a string literal
+
+```cpp
+// p_message is start address of a char array
+char* p_message { "hello world"};
+char* p_m2 = "hi world"; // similar code smell
+```
+But this is a code smell because
+`p_message[0] = 'J';` will crash because
+we are trying to write into a read only string.
+
+Better practice is to use a `const char*`
+i.e.
+```cpp
+// read only string
+const char* p { "hey world" };
+```
+
+If you want to have modifiable char arrays,
+Use char arrays instead:
+```cpp
+char m2[] { "Hi world" };
+m2[1] = 'e';// Ok 
+```
+
+#### Pointers and const
+
+four types:
+1. `non-const pointer to non-const data`: both pointer and data can change e.g. `int* j`: `pointer to int`
+2. `non-const pointer to const data`: pointer can change, but pointed data cannot change e.g. `const int* j`: `non const pointer to const int`.
+3. `const pointer to non-const data`: pointer cannot change, but pointed data can change e.g. `int *const j`
+4. `const pointer to const data`: pointer cannot change and pointed data cannot change `const int *const j`
+
+`*const` is basically `const pointer`, basically `if const shows up to right of *, then pointer is const`.
+**Note** - constness is confined only to the pointer declaration and nothing to do with original value.
+
+`Note`: `char const *p` and `const char *p` are exactly the same thing.
+
+How to read declarations: http://faculty.cs.niu.edu/~mcmahon/CS241/Notes/reading_declarations.html
+
+#### pointers and arrays
+
+**similarity**:
+The array name can be treated as pointer to first element in the array.
+i.e. if you dereference array name, you will get first element of array
+if you print array name, it you will see address of first element
+
+Array braces is sugar for pointer arithmetic
+
+**Differences**:
+You can't point arrayname to something else like a regular pointer, so arrayname is more of a const pointer `*const`
+
+`std::size` works for arrayname, but not for pointers
+
+In essence, `array` is a const pointer i.e. `*const` with some `size` info.
+
+**Pointer decay** example:
+Case when pointer is initialized from array name
+```cpp
+int parr[] {1,2,3};
+int *pp {parr};// parr decayed to a pointer pp, decaying because we lost size info
+```
 ### Forward declaration.
 
 A forward declaration allows us to tell the compiler about the existence of an identifier before actually defining the identifier.
