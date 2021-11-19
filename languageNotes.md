@@ -17,6 +17,33 @@ In the rest of the cases, objects are allocated on stack.
 Start and end with `__` e.g. 
 `__func__` will return you name of the current function that is running.
 
+
+### common pointer mistakes
+
+1. using uninitialized pointer
+
+2. dereferencing null pointer or uninitialized pointer
+
+3. use after free
+
+4. double delete
+
+5. multiple pointers having same address
+
+6. deleting uninitialized memory
+
+Note `delete nullptr` is fine, i.e no-op.
+Note delete does not null out its operand, it instead frees memory pointed to by the operand
+### Best practices with pointer
+
+1. initialize pointers, with `nullptr` if you have not decided, else actual memoryaddress.
+
+2. pointer to be set to `nullptr` after delete (reset).
+
+3. `new` and `delete` should be in pairs.
+
+4. check for `nullptr` using if before dereferencing pointer.
+
 ### One definition rule
 
 File level `ODR`: Only one definition of any variable, function, class type, enumeration type, concept (since C++20) or template is allowed in any one translation unit (file).
@@ -82,6 +109,7 @@ Use char arrays instead:
 char m2[] { "Hi world" };
 m2[1] = 'e';// Ok 
 ```
+
 
 #### Pointers and const
 
@@ -559,3 +587,52 @@ class Something{
         {}
 };
 ```
+
+### memory leak
+
+Memory dynamically allocated by our app, but we have lost
+access to memory (for e.g.  via reassigning pointer)
+or double allocation for same pointer
+
+* scoped mem leak:
+```cpp
+int main(){
+    {
+        int *pnum { new int{57}};
+    }// mem with int{57} leaked since we did not delete pnum
+    return 0;
+}
+```
+
+### Exception handling
+
+#### Using `try/catch`
+
+Generic way to handle with try/catch
+
+```cpp
+try{
+    doSOmething();
+} catch(std::exception& ex) {
+    std::cout << ex.what() <<endl;
+}
+```
+
+### Array heap vs stack allocation
+
+You can create an array of objects on the stack† via:
+```cpp
+myarray stackArray[100]; // 100 objects
+And on the heap† (or "freestore"):
+```
+
+```cpp
+myarray* heapArray = new myarray[100];
+delete [] heapArray; // when you're done
+```
+But it's best not manage memory yourself. Instead, use a std::vector:
+```cpp
+#include <vector>
+std::vector<myarray> bestArray(100);
+```
+A vector is a dynamic array, which (by default) allocates elements from the heap
