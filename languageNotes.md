@@ -368,10 +368,25 @@ A function defined within a class definition is an inline function.
 
 
 ### References
+
+Initializing references
+```cpp
+	int kbc = 11;
+	int& kbref{ kbc };// kbref is alias to kbc
+    int& kb2 = kbc; // also valid way to initialize ref
+    std::cout << "Value of kbref = " << kbref << std::endl;//11
+	kbref = 222;// writing via ref/alias
+	std::cout << "value of kbc after changing kbref = " << kbc << std::endl;// 222
+```
+
+You can read reference `int& a` as `a is reference to int` or `a is an alias of int`
+Reference cannot be uninitialized,
+and reference cannot be made to refer/alias anything else once created.
 https://isocpp.org/wiki/faq/references
 
 An alias (an alternate name) for an object.
-
+The address of a reference is the actual object's address
+References are kind of like const pointers but not exactly.
 References are frequently used for pass-by-reference:
 
 ```cpp
@@ -388,6 +403,12 @@ int main()
 }
 ```
 Here i and j are aliases for main’s x and y respectively. In other words, i is x — not a pointer to x, nor a copy of x, but x itself. Anything you do to i gets done to x, and vice versa. This includes taking the address of it. The values of &i and &x are identical.
+
+**Note** you cannot take non-const references to const origin
+```cpp
+    const int age{33};
+    int& age_ref{age};// compiler error
+```
 
 #### Call by value or call by reference?
 
@@ -415,7 +436,7 @@ Note also that a call of a member function is essentially a call-by-reference on
 ### references
 
 * references must always be initialized, otherwise it is a compiler error.
-
+* The address of a reference is the actual object's address
 * the construction argument for a reference has to be l-value
 e.g. 
 ```cpp
@@ -445,6 +466,7 @@ YOu can declare const ref to a non-const value but not the other way:
 ```cpp
     int c1 = 2;
     const int& cr1 { c1};// ok, cr1 considered read only reference/alias of c1
+    c1 = 11;// c1 is still writable. only the above ref is read only
 
     const int c2 = 3;
     int& cr2 {c2};// compiler error because cr2 can change things
@@ -526,6 +548,7 @@ int main()
 ```
 
 For arrays:
+In cpp, array symbol `[]` always goes after variable name.
 ```cpp
 class Something
 {
@@ -627,7 +650,7 @@ And on the heap† (or "freestore"):
 ```
 
 ```cpp
-myarray* heapArray = new myarray[100];
+myarray* heapArray = new myarray[100];// note: always need to use pointer to get new result
 delete [] heapArray; // when you're done
 ```
 But it's best not manage memory yourself. Instead, use a std::vector:
