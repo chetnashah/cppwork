@@ -513,6 +513,12 @@ int main()
 }
  ```
 
+
+### Constructors
+
+`Constructors` are present to initialize members, no need to returna anything from constructors.
+
+
 ### Member initializer list
 The member initializer list is inserted after the constructor parameters. It begins with a colon (:), and then lists each variable to initialize along with the value for that variable separated by a comma.
 
@@ -659,3 +665,39 @@ But it's best not manage memory yourself. Instead, use a std::vector:
 std::vector<myarray> bestArray(100);
 ```
 A vector is a dynamic array, which (by default) allocates elements from the heap
+
+
+### copy constructor vs assignment
+
+`=` can invoke either `copy assignment operator` or `copy constructor` depending on whether the variable being declared is initialized already or not.
+
+```cpp
+class Widget {
+public:
+	Widget() = default;
+	Widget(const Widget& other) { // read only alias to other is provided in copy constructor
+		std::cout << "Copy constructor" << std::endl;
+	}
+	Widget& operator=(Widget& other) {
+		std::cout << "Copy assignment operator" << std::endl;
+		return other;
+	}
+};
+
+Widget w1; // default constructor
+Widget w2(w1); //copy constructor
+Widget w3{ w1 }; // copy constructor
+
+Widget w4 = w1; // copy constructor, because w4 is being initialized first time
+Widget w5;// default constructor
+w5 = w1; // copy assingment operator
+```
+
+### pass by value invokes copy constructors
+
+Unless you pass a reference of an object, pass by value happens 
+and copy constructor is invoked on the function param side.
+
+Pass by reference to const, is an alternative choice, if function
+needs it for read only purposes and/or copy might be expensive
+
