@@ -1,4 +1,5 @@
 
+`size_t` is `unsinged`.
 
 ### reading pointers and references
 
