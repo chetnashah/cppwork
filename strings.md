@@ -97,3 +97,47 @@ For comparision and equality,
 	std::cout << "strlen(mp1):" << strlen(mp1) << std::endl;// 41, excludes null char
 	std::cout << "sizeof(mp1):" << sizeof(mp1) << std::endl;// 8, pointer size
 ```
+
+### converting to and from strings
+
+Use `std::to_string(val)` to coerce any value to a string.
+To convert from string to other types use `stoX` set of functions.
+```cpp
+	std::cout << std::string{ "Hi " }.append(std::to_string(11.11f)) << std::endl;
+
+	float f = 11.2f;
+	f += std::stof("2.2f");
+
+	std::cout << std::string{ "AFter addition: " } << f << std::endl;
+```
+
+### raw string literals
+
+prefix a quoted string with `R"(actualstring)"` to signify it as a raw string literal.
+```cpp
+std::string m_str{ R"(abc)" };
+std::string todo_list = R"( // can be useful for multiline strings
+	Hey 
+	hello world
+)"
+```
+
+### Saving memory with `std::string_view`
+
+introduced in `C++17`
+
+```cpp
+#include <iostream>
+#include <string_view>
+
+int main()
+{
+  std::string_view text{ "hello" }; // view the text "hello", which is stored in the binary
+  std::string_view str{ text }; // view of the same "hello"
+  std::string_view more{ str }; // view of the same "hello"
+
+  std::cout << text << ' ' << str << ' ' << more << '\n';
+
+  return 0;
+}
+```
