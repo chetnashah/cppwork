@@ -21,8 +21,10 @@ Start and end with `__` e.g.
 
 ### sizeof operator
 
-`sizeof` on a array would return arraysize,
+`sizeof` on a array would return full size (no of elements * element size),
 but on a decayed pointer or a pointer returns pointer size.
+
+### std::size vs sizeof
 
 ### common pointer mistakes
 
@@ -172,6 +174,18 @@ Sizeof on array function parameter will return size of 'std::string *' (aka 'bas
 ```
 
 Hence recommended best practice: also pass array size as separate function parameter
+
+Approach2: pass arrays by reference, so size and other info is retained:
+```cpp
+void foo(double (&arr)[10])
+{
+}
+
+int main(){
+
+}
+```
+
 
 ### Forward declaration.
 
