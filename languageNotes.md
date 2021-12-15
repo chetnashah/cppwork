@@ -19,6 +19,11 @@ Start and end with `__` e.g.
 `__func__` will return you name of the current function that is running.
 
 
+### sizeof operator
+
+`sizeof` on a array would return arraysize,
+but on a decayed pointer or a pointer returns pointer size.
+
 ### common pointer mistakes
 
 1. using uninitialized pointer
@@ -149,6 +154,25 @@ Case when pointer is initialized from array name
 int parr[] {1,2,3};
 int *pp {parr};// parr decayed to a pointer pp, decaying because we lost size info
 ```
+
+#### passing arrays to functions
+
+Passing arrays to funtions decays the pointer at function definition side
+
+```cpp
+void arraytaker(std::string strArr[]) {// strArr is decayed into a pointer
+    std::cout << strArr[0] <<std::endl;
+    std::cout << sizeof(strArr) << std::endl;
+}
+```
+
+e.g. xcode will show following warning:
+```
+Sizeof on array function parameter will return size of 'std::string *' (aka 'basic_string<char> *') instead of 'std::string []'
+```
+
+Hence recommended best practice: also pass array size as separate function parameter
+
 ### Forward declaration.
 
 A forward declaration allows us to tell the compiler about the existence of an identifier before actually defining the identifier.
