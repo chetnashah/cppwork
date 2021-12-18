@@ -3,18 +3,56 @@
 
 Type for string literal is `const char *`
 
+`strlen` is linear time function.
+
+The string object itself is stored on the stack but it points to memory that is on the heap.
+But there is an optimization, short string optimization where the data is inline, instead on the heap.
+
+
 ### char array representation
 
 ```cpp
 char message[] {"hi world"};// note [] after variable name instead of after char like java
 char msg2[] {'H','e', 'y','\0'};// same as above
 ```
+for length prefer `strlen`, nothing else works e.g. `sizeof` does not work
+reason:
+```cpp
+char abc[55] = "hello ";
+
+std::cout << "sizeof(abc) " << sizeof(abc) << std::endl; // 55
+std::cout << "sizeof(abc)/sizeof(abc[0])" << sizeof(abc)/sizeof(abc[0]) << std::endl; // 55/1 = 55
+```
+
+```cpp
+char message[] {"hi world"};
+
+std::cout << sizeof(message) << std::endl;// 9 includes null terminator
+std::cout << strlen(message) << std::endl;// 8 excludes null terminator
+```
+
 
 ### const char* representation
 
 ```cpp
 const char* mm = "hey world";// no need to delete this, since no new was used
 cout << mm << endl;
+```
+for length, prefer `strlen` nothing else works, `sizeof` does not work
+
+### C-String
+
+C-strings are simply implemented as a `char array` which is terminated by a null character (aka 0). 
+This last part of the definition is important: all C-strings are char arrays, but not all char arrays are c-strings
+
+
+### String literal
+
+String literals are indicated by using the double quote (") and are stored as a constant `(const) C-string`.
+The null character is automatically appended at the end for your convenience.
+
+```cpp
+const char * str = "This is a string literal. See the double quotes?";
 ```
 
 ### std::string
@@ -29,7 +67,7 @@ Has useful convinience operators like `+` for concatenating strings.
 1. convert `std::string` to a `const char *` string - use `str.c_str()`.
 If you need modifiable `char *`, you should use `str.data()`
 
-Note: `std::string.size()` excludes `null terminator in size`. Also `length()` is exactly same as `size()`
+Note: `std::string.size()` excludes `null terminator in size`. Also `std::string.length()` is exactly same as `std::string.size()`
 
 `str.append(str2/cstr)` to append/concat strings 
 
@@ -50,6 +88,8 @@ Max possible chars possible in a string `str.max_size()`
 `str.resize(count)` -
 
 `str_a.swap(str_b)` - 
+
+
 #### std::string equality
 
 If two strings have same size and 
@@ -97,3 +137,16 @@ For comparision and equality,
 	std::cout << "strlen(mp1):" << strlen(mp1) << std::endl;// 41, excludes null char
 	std::cout << "sizeof(mp1):" << sizeof(mp1) << std::endl;// 8, pointer size
 ```
+
+
+### std::string_view
+
+If you are using C++17, you can avoid memory allocation and still enjoy the C++ string interfaces by using `std::string_view`. 
+The entire purpose of `std::string_view` is to avoid copying data which is already owned and of which only a fixed view is required. 
+A `std::string_view` can refer to both a C++ string or a C-string. All that `std::string_view` needs to store is a pointer to the character sequence and a length.
+
+`std::string_view` provides the same API that std::string does, 
+so it is a perfect match for C-style string literals.
+
+The only catch with `std::string_view` is that it is non-owning, 
+so the programmer is responsible for making sure the `std::string_view` does not outlive the string which it points to

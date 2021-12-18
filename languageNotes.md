@@ -26,6 +26,8 @@ but on a decayed pointer or a pointer returns pointer size.
 
 ### std::size vs sizeof
 
+`std::size()` expects a "true" array name with size information bundled in
+
 ### common pointer mistakes
 
 1. using uninitialized pointer
@@ -66,6 +68,30 @@ That is why it is ok to include headers that contain class definitions.
 This is exactly what happens when you put the definition of your class in a header file and then include this header in two .cpp files. Because of how the header inclusion works in C++ (by copy-and-paste), this renders the situation where the two .cpp files define the same class. There is no other way in C++ to share class definitions between files; therefore the compiler must accept the repeated definition of a given class in different files, but on provision that you do not try to do nasty tricks, like changing the definition of the same class from file to file. You are only expected to include the same header file in each .cpp file. Anything other than that is risky.
 
 https://stackoverflow.com/questions/4955159/is-is-a-good-practice-to-put-the-definition-of-c-classes-into-the-header-file
+
+### implicit conversions
+
+When you pass data of a type different than what the function takes,
+the compiler will try to insert an implicit conversion from the type you pass into the type that the compiler takes.
+if conversion fails, you'll get compiler error.
+
+* if you have a function that takes non-const reference and you pass in different type as argument,
+the compiler will prevent u from doing any implicit conversions
+
+i.e `compiler won't allow implicit conversions when non const reference parameters are involved.`
+
+```cpp
+void inc_num(int& num){
+    num++;
+}
+int main(){
+    double d_var{11.0};
+    inc_num(d_var); // compiler error
+    return 0;
+}
+```
+
+implicit conversion of pointer types - not allowed e.g. double* cannot be converted to int*.
 
 ### uninintialized values
 
@@ -162,7 +188,7 @@ int *pp {parr};// parr decayed to a pointer pp, decaying because we lost size in
 Passing arrays to funtions decays the pointer at function definition side
 
 ```cpp
-void arraytaker(std::string strArr[]) {// strArr is decayed into a pointer
+void arraytaker(std::string strArr[]) {// strArr is decayed into a pointer, even if there is a number in the square braces
     std::cout << strArr[0] <<std::endl;
     std::cout << sizeof(strArr) << std::endl;
 }
@@ -175,16 +201,27 @@ Sizeof on array function parameter will return size of 'std::string *' (aka 'bas
 
 Hence recommended best practice: also pass array size as separate function parameter
 
-Approach2: pass arrays by reference, so size and other info is retained:
+Approach2: pass arrays by reference, so size and other info is retained i.e not decayed
+Here numbers should match with signature
 ```cpp
-void foo(double (&arr)[10])
+void foo(std::string (&arr)[5])
 {
+    std::cout << "----foo start----" << std::endl;
+    std::cout << arr[0] <<std::endl;// hi
+    std::cout << sizeof(arr)/sizeof(arr[0]) << std::endl; // 5
+    std::cout << "-----foo end-----" << std::endl;
 }
 
-int main(){
 
+int main(int argc, const char * argv[]) {    
+    std::string arr[5] = {"hi", "hello", "how are", "what is", "jj"};
+    foo(arr);
+    return 0;
 }
 ```
+
+
+#### Multi dimension array function parameter
 
 
 ### Forward declaration.
@@ -192,6 +229,8 @@ int main(){
 A forward declaration allows us to tell the compiler about the existence of an identifier before actually defining the identifier.
 
 In the case of functions, this allows us to tell the compiler about the existence of a function before we define the function’s body. This way, when the compiler encounters a call to the function, it’ll understand that we’re making a function call, and can check to ensure we’re calling the function correctly, even if it doesn’t yet know how or where the function is defined.
+
+A forward declaration can have default values, definition can skip having default values.
 
 ```cpp
 #include <iostream>
@@ -740,3 +779,28 @@ and copy constructor is invoked on the function param side.
 Pass by reference to const, is an alternative choice, if function
 needs it for read only purposes and/or copy might be expensive
 
+### consteval vs constexpr
+
+`consteval` creates a so-called immediate function. Each invocation of an immediate function creates a compile-time constant. To say it more directly. A consteval (immediate) function is executed at compile-time.
+```cpp
+#include <iostream>
+
+consteval int sqr(int n) {
+    return n * n;
+}
+
+int main() {
+    std::cout << "sqr(5): " << sqr(5) << std::endl;     // (1)
+    const int a = 5;                                    // (2)
+    std::cout << "sqr(a): " << sqr(a) << std::endl;     
+    int b = 5;                                          // (3)
+    // std::cout << "sqr(b): " << sqr(b) << std::endl; ERROR
+}
+```
+
+consteval cannot be applied to destructors or functions which allocate or deallocate
+`consteval` - It declares immediate functions, that is, functions that must be evaluated at compile time to produce a constant. 
+(It used to be spelled constexpr! in a previous revision of the paper.) 
+In contrast, `constexpr` functions may be evaluated at compile time or run time, and need not produce a constant in all cases.
+
+`constinit` - constinit can be applied to variables with static storage duration or thread storage duration.
