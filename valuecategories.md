@@ -2,6 +2,19 @@
 ### delete nullptr is ok i.e. no-op
 
 
+### categories 
+1. An `lvalue` (so-called, historically, because lvalues could appear on the left-hand side of an assignment expression) designates a function or an object. [Example: If E is an expression of pointer type, then *E is an lvalue expression referring to the object or function to which E points. As another example, the result of calling a function whose return type is an lvalue reference is an lvalue.]
+2. An `xvalue` (an “eXpiring” value) also refers to an object, usually near the end of its lifetime (so that its resources may be moved, for example). An xvalue is the result of certain kinds of expressions involving rvalue references. [Example: The result of calling a function whose return type is an rvalue reference is an xvalue.]
+3. A `glvalue` (“generalized” lvalue) is an lvalue or an xvalue.
+4. An `rvalue` (so-called, historically, because rvalues could appear on the right-hand side of an assignment expression) is an xvalue, a temporary object or subobject thereof, or a value that is not associated with an object.
+5. A `prvalue` (“pure” rvalue) is an rvalue that is not an xvalue. [Example: The result of calling a function whose return type is not a reference is a prvalue]
+
+
+### digram (courtesy of bajamircea)
+
+![value catgories](images/value-categories.png "Value categories")
+
+
 ### lvalue
 
 Locator value - l-values have assigned memory address.

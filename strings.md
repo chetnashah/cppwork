@@ -150,3 +150,21 @@ so it is a perfect match for C-style string literals.
 
 The only catch with `std::string_view` is that it is non-owning, 
 so the programmer is responsible for making sure the `std::string_view` does not outlive the string which it points to
+
+### Return value optimizations (RVO) for string return
+
+```cpp
+std::string stringadder(std::string a, std::string b){
+    std::string result = a + b;
+    std::cout << "address of result = " << &result << std::endl;
+    return result;
+}
+
+int main(int argc, const char * argv[]) {
+    std::string res = stringadder("hi ", "hello");
+    std::cout << "in main res address: " << &res << std::endl;
+    return 0;
+}
+// address of result = 0x16fdff298
+// in main res address: 0x16fdff298
+```

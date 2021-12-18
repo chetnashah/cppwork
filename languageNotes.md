@@ -777,7 +777,21 @@ Unless you pass a reference of an object, pass by value happens
 and copy constructor is invoked on the function param side.
 
 Pass by reference to const, is an alternative choice, if function
-needs it for read only purposes and/or copy might be expensive
+needs it for read only purposes and/or copy might be expensive'
+
+### Returning references to local variables from functions is a bad practice, similarly returning pointers to local vars is bad practice
+
+function local vars are allocated on stack and typically do not live longer than the duration of the function call.
+
+Can result in a crash:
+```cpp
+// warning:: Reference to stack memory associated with local variable 'result' returned
+int& sum (int a, int b) {
+    int result = a+b;
+    return result;
+}
+```
+
 
 ### consteval vs constexpr
 
