@@ -1,6 +1,14 @@
 
 `size_t` is `unsinged`.
 
+global variables are initialized even before the main functions run.
+
+
+### static variables
+
+even though static variables might have larger storage duration then the function they are declared in,
+static variables will be access scoped to functions that they are declared in. 
+
 ### reading pointers and references
 
 When reading always refer pointers as `pointers to` and references as `references to`.
@@ -218,6 +226,182 @@ int main(int argc, const char * argv[]) {
     foo(arr);
     return 0;
 }
+```
+
+### `int&` and `const int&` are two different types so valid overloads
+
+non-const references and const references are different types so valid in overloads
+
+### No point making type const for function params, results in redefinition
+
+```cpp
+int max (const int a, const int b){// same as below because original values are passed by copy
+    return 1;
+}
+
+int max(int a, int b){ // COMPILER ERROR! max redefinition
+    return 0;
+}
+
+int main( ){
+    int j =0;
+    int k =8;
+    max(j,k);
+       
+    return 0;
+}
+```
+
+### naked auto return will does a copy
+
+naked auto return type deduction, so it's returning a copy
+```cpp
+// naked auto return is returning a copy, it should be auto&
+auto multiplty(double& a, double & b){
+    return a*=b;
+}
+ 
+int main(){
+ 
+    auto value1{10.0};
+    auto value2{20.0};
+ 
+    double& result = multiplty(value1,value2);
+    std::cout << "result : " << result << " value1 : " << value1 << " value2 : " << value2<< std::endl;
+    ++result;
+    std::cout << "result : " << result << " value1 : " << value1 << " value2 : " << value2<< std::endl;
+ 
+    return 0;
+}
+
+```
+
+### auto and references
+
+
+```cpp
+int main(){
+ 
+    unsigned int age1{21};
+    unsigned int& age_ref{age1};
+    auto& age2{age_ref};// true reference in auto via auto&
+ 
+    std::cout << "age1 : " << age1 << " age2 : " << age2 << std::endl;
+    ++age2;
+    std::cout << "age1 : " << age1 << " age2 : " << age2 << std::endl;
+ 
+    return 0;
+}
+// 21 21
+// 22 22
+```
+
+### returning references from functions
+
+```cpp
+int returnByValue()
+{
+    return 5;
+}
+
+int& returnByReference()
+{
+     static int x{ 5 }; // static ensures x isn't destroyed when the function ends
+     return x;
+}
+
+int main()
+{
+    int giana{ returnByReference() }; // case A -- ok, treated as return by value
+    int& ref{ returnByValue() }; // case B -- compile error since the value is an r-value, and an r-value can't bind to a non-const reference
+    const int& cref{ returnByValue() }; // case C -- ok, the lifetime of the return value is extended to the lifetime of cref
+
+
+    return 0;
+}
+```
+
+if a refernce is returned but the receiving value is a normal variable,
+a copy happens:
+```cpp
+
+```
+
+
+### returning reference can be thought of a named alias
+
+```cpp
+#include <array>
+#include <iostream>
+
+// Returns a reference to the index element of array
+int& getElement(std::array<int, 25>& array, int index)
+{
+    // we know that array[index] will not be destroyed when we return to the caller (since the caller passed in the array in the first place!)
+    // so it's okay to return it by reference
+    return array[index];
+}
+
+int main()
+{
+    std::array<int, 25> array;
+
+    // Set the element of array with index 10 to the value 5
+    getElement(array, 10) = 5;
+    std::cout << array[10] << '\n';
+
+    return 0;
+}
+```
+
+### auto references type deduction
+
+```cpp
+    int k = 1;
+    const int& j = k;
+    
+    auto jref = j;
+    ++jref; // BAD! should not allow for const refs
+
+
+    // in order to fix it use auto&
+
+    auto& anotherjref = j;
+    //++anotherjref //now correctly throws compiler error
+```
+
+### auto return type dedection for conflicting return types
+
+```cpp
+// compiler error! different branches returning different types
+auto mixedreturntype(int k){
+    if (k > 2) {
+        return 10;
+    } else {
+        return 10.2f;
+    }
+}
+```
+
+### Ambiguous function overloads with reference based parameters
+
+```cpp
+int max (const int &a, int&b){
+    return 1;
+}
+
+int max(int a, int b){
+    return 0;
+}
+
+int main( ){ 
+    int j =0;
+    int k =8;
+    max(j,k);// COMPILER ERROR! call to max is ambiguous
+    
+    return 0;
+}
+
 ```
 
 

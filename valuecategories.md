@@ -15,6 +15,8 @@
 ![value catgories](images/value-categories.png "Value categories")
 
 
+
+https://www.fluentcpp.com/2018/02/06/understanding-lvalues-rvalues-and-their-references/
 ### lvalue
 
 Locator value - l-values have assigned memory address.
