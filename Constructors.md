@@ -112,3 +112,27 @@ Avoid using copy initialization, and use uniform initialization instead.
 
 **Note** - When you pass or return a class by value, that process uses copy initialization.
 
+
+
+### default initialization (no initializer)
+
+* variables defined outside function body are given value 0.
+* variables of built-in types defined inside a function are unintialized. (random value)
+```cpp
+int main( ){
+    int lll;
+    std::cout <<lll <<std::endl;// random value
+    return 0;
+}
+```
+* Objects of class type that we do not explicitly initialize have a value that is defined by the class.
+
+
+
+### declarations and definitions
+
+variables must be defined once, can be declared many times
+```cpp
+extern int i; // declaration only, definition elsewhere
+int j; // declaraiton and definition
+```

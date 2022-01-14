@@ -408,6 +408,8 @@ int main( ){
 #### Multi dimension array function parameter
 
 
+
+
 ### Forward declaration.
 
 A forward declaration allows us to tell the compiler about the existence of an identifier before actually defining the identifier.
@@ -645,6 +647,8 @@ You can read reference `int& a` as `a is reference to int` or `a is an alias of 
 Reference cannot be uninitialized,
 and reference cannot be made to refer/alias anything else once created.
 https://isocpp.org/wiki/faq/references
+
+Because there is no way to rebind a reference, references must always be initialized.
 
 An alias (an alternate name) for an object.
 The address of a reference is the actual object's address
@@ -1002,3 +1006,132 @@ consteval cannot be applied to destructors or functions which allocate or deallo
 In contrast, `constexpr` functions may be evaluated at compile time or run time, and need not produce a constant in all cases.
 
 `constinit` - constinit can be applied to variables with static storage duration or thread storage duration.
+
+
+### const member functions
+
+A member function that inspects, rather than mutating its object
+Member functions with a const suffix are called “const member functions” or “inspectors.” Member functions without a const suffix are called “non-const member functions” or “mutators.”
+
+
+```cpp
+class Fred {
+public:
+  void inspect() const;   // This member promises NOT to change *this
+  void mutate();          // This member function might change *this
+};
+void userCode(Fred& changeable, const Fred& unchangeable)
+{
+  changeable.inspect();   // Okay: doesn't change a changeable object
+  changeable.mutate();    // Okay: changes a changeable object
+  unchangeable.inspect(); // Okay: doesn't change an unchangeable object
+  unchangeable.mutate();  // ERROR: attempt to change unchangeable object
+}
+```
+
+### What do “X const& x” and “X const* p” mean?
+It is just a writing style, but essentially the same as below:
+`X const& x` is equivalent to `const X& x`, and `X const* x` is equivalent to `const X* x`.
+
+### Does “X& const x” make any sense?
+No. It is nonsense.
+“x is a const reference to a X”. But that is redundant — references are always const, in the sense that you can never reseat a reference to make it refer to a different object. Never. With or without the const.
+
+In other words, `X& const x` is functionally equivalent to `X& x`
+
+
+### Implicit const promotion
+
+The compiler is free to add "const"ness (implicitly promote)
+for an object to satisfy expression, `but it cannot take it away`.
+
+pointers case:
+```cpp
+int d = 1;
+int *p1 = &d;
+const int* p2 = p1; // implicit promotion to const
+int *p3 = p2; // demotion to non-const not possible, exact error: Cannot initialize a variable of type 'int *' p3 with an lvalue of type 'const int *' p2
+```
+
+references case:
+
+
+### const initialization
+
+You must instantiate/define const, if non extern, default unitialized is not allowed.
+following is invalid:
+```cpp
+int main( ){
+    const int jj;// Error: Default initialization of an object of const type 'const int'
+    jj = 0;// Error: Cannot assign to variable 'jj' with const-qualified type 'const int'
+    extern const int ii; //Ok:  this is fine
+    return 0;
+}
+```
+
+### Const overloading
+
+const overloading is when you have an inspector method and a mutator method with the same name and the same number of and types of parameters. 
+The two distinct methods differ only in that the inspector is const and the mutator is non-const.
+
+```cpp
+class Fred { /*...*/ };
+class MyFredList {
+public:
+  const Fred& operator[] (unsigned index) const;  // Subscript operators often come in pairs
+  Fred&       operator[] (unsigned index);        // Subscript operators often come in pairs
+  // ...
+};
+
+void f(MyFredList& a)  // The MyFredList is non-const
+{
+  // Okay to call methods that inspect (look but not mutate/change) the Fred at a[3]:
+  Fred x = a[3];       // Doesn't change to the Fred at a[3]: merely makes a copy of that Fred
+  a[3].inspect();      // Doesn't change to the Fred at a[3]: inspect() const is an inspector-method
+  // Okay to call methods that DO change the Fred at a[3]:
+  Fred y;
+  a[3] = y;            // Changes the Fred at a[3]
+  a[3].mutate();       // Changes the Fred at a[3]: mutate() is a mutator-method
+}
+
+void f(const MyFredList& a)  // The MyFredList is const
+{
+  // Okay to call methods that DON'T change the Fred at a[3]:
+  Fred x = a[3];
+  a[3].inspect();
+
+  // Compile-time error (fortunately!) if you try to mutate/change the Fred at a[3]:
+  Fred y;
+  a[3] = y;       // Fortunately(!) the compiler catches this error at compile-time
+  a[3].mutate();  // Fortunately(!) the compiler catches this error at compile-time
+}
+
+```
+The const subscript operator returns a const-reference, so the compiler will prevent callers from inadvertently mutating/changing the Fred. The non-const subscript operator returns a non-const reference, which is your way of telling your callers (and the compiler) that your callers are allowed to modify the Fred object.
+
+When a user of your MyFredList class calls the subscript operator, the compiler selects which overload to call based on the constness of their MyFredList. If the caller has a `MyFredList a` or `MyFredList& a`, then `a[3]` will call the non-const subscript operator, and the caller will end up with a non-const reference to a Fred:
+
+
+### void pointers can hold any pointers
+
+void pointers can hold pointers of any type. 
+Generally we use void* to treat memory as opaque memory.
+also the type of data at void pointers is not known:
+Note:
+1. you cannot dererference a void*, you must cast it to a type based pointer first.
+
+```cpp
+int main( ){
+    int* k;
+    int j = 1;
+    double d = 0.01;
+    k = &j;
+    void* ad = k;// void* holding an int*
+    ad = &d;// not it holding a double*
+
+    std::cout << *ad << std::endl;// Error! cannot dereference a void *
+    double *dd = (double *)ad;// cast to a typed pointer first so it can be dereferenced
+    std::cout << *dd << std::endl;// Ok
+    return 0;
+}
+```
