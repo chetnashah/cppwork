@@ -724,7 +724,7 @@ e.g.
 //Instead of changing ref to reference variable v2, it assigns the value of v2 to v1
 ```
 
-#### const references
+#### const references (also known as reference to const typeX)
 
 A reference to a const value is often called a const reference for short.
 
@@ -737,9 +737,25 @@ YOu can declare const ref to a non-const value but not the other way:
     const int c2 = 3;
     int& cr2 {c2};// compiler error because cr2 can change things
 
-    // also works with r-value in constructor
+    // also works with r-value/temporaries in constructor
     const int& ref3{ 6 }; // okay, 6 is an r-value
 ```
+
+Another example:
+```cpp
+    int i = 42;// ok
+    const int &r1 = i;// ok
+    const int &r2 = 42;// ok
+    const int &r3 = r1 * 2;// ok
+    int& r4 = r1 * 2;// Error: Non-const lvalue reference to type 'int' cannot bind to a temporary of type 'int'
+    int& r5 = r1;// Error: Binding reference of type 'int' to value of type 'const int' drops 'const' qualifier
+```
+
+#### Why non-const ref cannot bind to temporaries but const references can ?
+https://stackoverflow.com/questions/1565600/how-come-a-non-const-reference-cannot-bind-to-a-temporary-object
+to protect people from changing the values of temporaries that are destroyed before their new value can be used
+you shouldn't try to modify temporaries for the very reason that they are temporary objects and will die any moment now.
+temporaries die at the end of the statement, unless they are bound to const reference, in which case they die when the reference goes out of scope
 
 #### references to const initialized via r-values, extend lifetime of r-values
 
@@ -1135,3 +1151,49 @@ int main( ){
     return 0;
 }
 ```
+
+### declarations
+
+https://en.cppreference.com/w/cpp/language/declarations
+
+Variable Declarations in c++ will usually have
+1. type specifier (int/classn name etc)
+2. declarator (identifier of the variable)
+3. (optional) initializer
+
+
+### Viewing clang AST
+
+c++ grammar: https://alx71hub.github.io/hcb/#basic.link
+
+Many important AST nodes derive from `Type`, `Decl` - declarations, `DeclContext` or `Stmt` - statement, with some classes deriving from both `Decl` and `DeclContext`
+
+
+
+```cpp
+$ cat test.cc
+int f(int x) {
+  int result = (x / 42);
+  return result;
+}
+
+# Clang by default is a frontend for many tools; -Xclang is used to pass
+# options directly to the C++ frontend.
+$ clang -Xclang -ast-dump -fsyntax-only test.cc
+TranslationUnitDecl 0x5aea0d0 <<invalid sloc>>
+... cutting out internal declarations of clang ...
+`-FunctionDecl 0x5aeab50 <test.cc:1:1, line:4:1> f 'int (int)'
+  |-ParmVarDecl 0x5aeaa90 <line:1:7, col:11> x 'int'
+  `-CompoundStmt 0x5aead88 <col:14, line:4:1>
+    |-DeclStmt 0x5aead10 <line:2:3, col:24>
+    | `-VarDecl 0x5aeac10 <col:3, col:23> result 'int'
+    |   `-ParenExpr 0x5aeacf0 <col:16, col:23> 'int'
+    |     `-BinaryOperator 0x5aeacc8 <col:17, col:21> 'int' '/'
+    |       |-ImplicitCastExpr 0x5aeacb0 <col:17> 'int' <LValueToRValue>
+    |       | `-DeclRefExpr 0x5aeac68 <col:17> 'int' lvalue ParmVar 0x5aeaa90 'x' 'int'
+    |       `-IntegerLiteral 0x5aeac90 <col:21> 'int' 42
+    `-ReturnStmt 0x5aead68 <line:3:3, col:10>
+      `-ImplicitCastExpr 0x5aead50 <col:10> 'int' <LValueToRValue>
+        `-DeclRefExpr 0x5aead28 <col:10> 'int' lvalue Var 0x5aeac10 'result' 'int'
+```
+
