@@ -263,3 +263,22 @@ int main()
                    //        B::B()
 }
 ```
+
+### Friend classes
+
+Only class implementer can declare who its friends are.
+A function or class cannot declare itself as a friend of any class.
+
+In class definition use the `friend` keyword and name of a non-member function or other class to grant it
+access to the private and protected members of your class.
+
+Friendship is not transitive (a friend of your friend is not your friend).
+Friendship is not inherited (your friend's children are not your friends).
+
+
+
+```cpp
+class M {
+  friend class F;
+}
+```

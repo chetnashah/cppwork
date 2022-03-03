@@ -125,6 +125,12 @@ four types:
 
 `Note`: `char const *p` and `const char *p` are exactly the same thing.
 
+Terminology: `top-level const` and `low level const`:
+`int *p`: **Normal Pointer** can be used for making changes to the underlying object and can be reassigned.
+`int *const cp` **(top-level const)**: Const Pointer can be used for making changes to the underlying object but cannot be reassigned. (Cannot change it to point to another object.)
+`const int *pc` **(low-level const)**: Pointer to Const cannot be used for making changes to the underlying object but can itself be reassigned.
+`const int *const cpc` **(both top and low-level const)**: Const Pointer to a Const can neither be used for making changes to the underlying object nor can itself be reassigned.
+
 How to read declarations: http://faculty.cs.niu.edu/~mcmahon/CS241/Notes/reading_declarations.html
 
 #### pointers and arrays
@@ -438,7 +444,7 @@ Note also that a call of a member function is essentially a call-by-reference on
 
 * references must always be initialized, otherwise it is a compiler error.
 * The address of a reference is the actual object's address
-* the construction argument for a reference has to be l-value
+* the construction argument for a reference has to be l-value, but can be rvalue for const references(they bound to rvalues and increase their lifetime)
 e.g. 
 ```cpp
 int& j { 2}; // compiler error because 2 is not a l-value
@@ -487,6 +493,9 @@ int somefcn()
 } // and the lifetime of the r-value is extended to here, when the const reference dies
 ```
 
+Note: this does not work for reference to non-const types.
+e.g. `int& ref{2+3};` will fail.
+
 #### const refs as function parameters
 
 THis is same as read only reference passed to function, where function will not be able to modify.
@@ -514,7 +523,27 @@ int main()
 }
  ```
 
+### const pointers/references and copying/initialization
 
+basically once const promoted, you cannot go back, as that would allow to change things.
+
+`pointers`: can bind pointer to const to pointer to non-const (const promotion), but not bind pointer to non-const to pointer to const. 
+as it will result in `invalid conversion from 'const int*' to 'int*'`.
+```cpp
+// Error case
+int i = 11;
+const int *p3 = &i;// p3 is read-only-content pointer
+int * p2 = p3;// Error! you can change content pointed via  p3 by p2
+```
+
+you can bind a const reference to a non-const object (const promotion), 
+you cannot bind a non-const reference to a const-object, as that would drop, disregard or ignore the const qualifier
+```cpp
+// Error case
+int i = 11;
+const int &r1 = i;// p3 is read-only-content pointer
+int &r2 = r1;// Error! binding reference of type 'int&' to 'const int' discards qualifiers
+```
 ### Constructors
 
 `Constructors` are present to initialize members, no need to returna anything from constructors.
@@ -701,4 +730,51 @@ and copy constructor is invoked on the function param side.
 
 Pass by reference to const, is an alternative choice, if function
 needs it for read only purposes and/or copy might be expensive
+
+### A reference/pointer to const may refer to an object that is not const
+
+It is important to realize that a reference to const restricts only what we can do through that reference.
+Binding a reference to const to an object says nothing about whether the underlying object itself is const.
+meaning reference to const is a read-only alias of the original object which may be modifiable via other means.
+```cpp
+int i = 42;
+int &r1 = i;// non const reference r1 bound to i
+const int &r2 = i; // r2 also bound to i, but cannot be used to change i
+r1 = 0; // fine
+r2 = 0; //ERROR!! not allowed to change underlyng object using const reference r2
+```
+
+Similarly, a pointer to const says nothing about underlying object, restricts only what we can do through the pointer.
+Think of it as a read-only-content pointer to original object which can be modifiable via other means
+```cpp
+double pi = 3.14;
+const double* cptr = &pi;// cptr is a pointer to const double
+*cptr = 11;// Error! cannot change via cptr
+```
+
+**Tip** - Think of pointers and references to const as pointers or refernces `that think they point or refer to const`.
+
+
+### Literal types
+
+`Artihmetic types`, `reference type` and `pointer type` are literal types.
+These types can be used ina `constexpr`.
+
+The address of object defined outside any function is a constant expression, 
+and may be used to initialize a constexpr pointer,
+and may be used to initialize a constexpr reference.
+
+`constexpr` imposes a top-level const. 
+i.e. 
+```cpp
+const int* p = nullptr; // p is a pointer to const int
+constexpr int* q = nullptr;// q is a const pointer to int
+constexpr const int* q2 = nullptr; // q2 is a const pointer to const int
+```
+
+
+### Typealias
+
+
+### decltype
 
