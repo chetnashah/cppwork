@@ -1,6 +1,14 @@
 
 `size_t` is `unsinged`.
 
+global variables are initialized even before the main functions run.
+
+
+### static variables
+
+even though static variables might have larger storage duration then the function they are declared in,
+static variables will be access scoped to functions that they are declared in. 
+
 ### reading pointers and references
 
 When reading always refer pointers as `pointers to` and references as `references to`.
@@ -18,6 +26,15 @@ In the rest of the cases, objects are allocated on stack.
 Start and end with `__` e.g. 
 `__func__` will return you name of the current function that is running.
 
+
+### sizeof operator
+
+`sizeof` on a array would return full size (no of elements * element size),
+but on a decayed pointer or a pointer returns pointer size.
+
+### std::size vs sizeof
+
+`std::size()` expects a "true" array name with size information bundled in
 
 ### common pointer mistakes
 
@@ -59,6 +76,30 @@ That is why it is ok to include headers that contain class definitions.
 This is exactly what happens when you put the definition of your class in a header file and then include this header in two .cpp files. Because of how the header inclusion works in C++ (by copy-and-paste), this renders the situation where the two .cpp files define the same class. There is no other way in C++ to share class definitions between files; therefore the compiler must accept the repeated definition of a given class in different files, but on provision that you do not try to do nasty tricks, like changing the definition of the same class from file to file. You are only expected to include the same header file in each .cpp file. Anything other than that is risky.
 
 https://stackoverflow.com/questions/4955159/is-is-a-good-practice-to-put-the-definition-of-c-classes-into-the-header-file
+
+### implicit conversions
+
+When you pass data of a type different than what the function takes,
+the compiler will try to insert an implicit conversion from the type you pass into the type that the compiler takes.
+if conversion fails, you'll get compiler error.
+
+* if you have a function that takes non-const reference and you pass in different type as argument,
+the compiler will prevent u from doing any implicit conversions
+
+i.e `compiler won't allow implicit conversions when non const reference parameters are involved.`
+
+```cpp
+void inc_num(int& num){
+    num++;
+}
+int main(){
+    double d_var{11.0};
+    inc_num(d_var); // compiler error
+    return 0;
+}
+```
+
+implicit conversion of pointer types - not allowed e.g. double* cannot be converted to int*.
 
 ### uninintialized values
 
@@ -155,11 +196,233 @@ Case when pointer is initialized from array name
 int parr[] {1,2,3};
 int *pp {parr};// parr decayed to a pointer pp, decaying because we lost size info
 ```
+
+#### passing arrays to functions
+
+Passing arrays to funtions decays the pointer at function definition side
+
+```cpp
+void arraytaker(std::string strArr[]) {// strArr is decayed into a pointer, even if there is a number in the square braces
+    std::cout << strArr[0] <<std::endl;
+    std::cout << sizeof(strArr) << std::endl;
+}
+```
+
+e.g. xcode will show following warning:
+```
+Sizeof on array function parameter will return size of 'std::string *' (aka 'basic_string<char> *') instead of 'std::string []'
+```
+
+Hence recommended best practice: also pass array size as separate function parameter
+
+Approach2: pass arrays by reference, so size and other info is retained i.e not decayed
+Here numbers should match with signature
+```cpp
+void foo(std::string (&arr)[5])
+{
+    std::cout << "----foo start----" << std::endl;
+    std::cout << arr[0] <<std::endl;// hi
+    std::cout << sizeof(arr)/sizeof(arr[0]) << std::endl; // 5
+    std::cout << "-----foo end-----" << std::endl;
+}
+
+
+int main(int argc, const char * argv[]) {    
+    std::string arr[5] = {"hi", "hello", "how are", "what is", "jj"};
+    foo(arr);
+    return 0;
+}
+```
+
+### `int&` and `const int&` are two different types so valid overloads
+
+non-const references and const references are different types so valid in overloads
+
+### No point making type const for function params, results in redefinition
+
+```cpp
+int max (const int a, const int b){// same as below because original values are passed by copy
+    return 1;
+}
+
+int max(int a, int b){ // COMPILER ERROR! max redefinition
+    return 0;
+}
+
+int main( ){
+    int j =0;
+    int k =8;
+    max(j,k);
+       
+    return 0;
+}
+```
+
+### naked auto return will does a copy
+
+naked auto return type deduction, so it's returning a copy
+```cpp
+// naked auto return is returning a copy, it should be auto&
+auto multiplty(double& a, double & b){
+    return a*=b;
+}
+ 
+int main(){
+ 
+    auto value1{10.0};
+    auto value2{20.0};
+ 
+    double& result = multiplty(value1,value2);
+    std::cout << "result : " << result << " value1 : " << value1 << " value2 : " << value2<< std::endl;
+    ++result;
+    std::cout << "result : " << result << " value1 : " << value1 << " value2 : " << value2<< std::endl;
+ 
+    return 0;
+}
+
+```
+
+### auto and references
+
+
+```cpp
+int main(){
+ 
+    unsigned int age1{21};
+    unsigned int& age_ref{age1};
+    auto& age2{age_ref};// true reference in auto via auto&
+ 
+    std::cout << "age1 : " << age1 << " age2 : " << age2 << std::endl;
+    ++age2;
+    std::cout << "age1 : " << age1 << " age2 : " << age2 << std::endl;
+ 
+    return 0;
+}
+// 21 21
+// 22 22
+```
+
+### returning references from functions
+
+```cpp
+int returnByValue()
+{
+    return 5;
+}
+
+int& returnByReference()
+{
+     static int x{ 5 }; // static ensures x isn't destroyed when the function ends
+     return x;
+}
+
+int main()
+{
+    int giana{ returnByReference() }; // case A -- ok, treated as return by value
+    int& ref{ returnByValue() }; // case B -- compile error since the value is an r-value, and an r-value can't bind to a non-const reference
+    const int& cref{ returnByValue() }; // case C -- ok, the lifetime of the return value is extended to the lifetime of cref
+
+
+    return 0;
+}
+```
+
+if a refernce is returned but the receiving value is a normal variable,
+a copy happens:
+```cpp
+
+```
+
+
+### returning reference can be thought of a named alias
+
+```cpp
+#include <array>
+#include <iostream>
+
+// Returns a reference to the index element of array
+int& getElement(std::array<int, 25>& array, int index)
+{
+    // we know that array[index] will not be destroyed when we return to the caller (since the caller passed in the array in the first place!)
+    // so it's okay to return it by reference
+    return array[index];
+}
+
+int main()
+{
+    std::array<int, 25> array;
+
+    // Set the element of array with index 10 to the value 5
+    getElement(array, 10) = 5;
+    std::cout << array[10] << '\n';
+
+    return 0;
+}
+```
+
+### auto references type deduction
+
+```cpp
+    int k = 1;
+    const int& j = k;
+    
+    auto jref = j;
+    ++jref; // BAD! should not allow for const refs
+
+
+    // in order to fix it use auto&
+
+    auto& anotherjref = j;
+    //++anotherjref //now correctly throws compiler error
+```
+
+### auto return type dedection for conflicting return types
+
+```cpp
+// compiler error! different branches returning different types
+auto mixedreturntype(int k){
+    if (k > 2) {
+        return 10;
+    } else {
+        return 10.2f;
+    }
+}
+```
+
+### Ambiguous function overloads with reference based parameters
+
+```cpp
+int max (const int &a, int&b){
+    return 1;
+}
+
+int max(int a, int b){
+    return 0;
+}
+
+int main( ){ 
+    int j =0;
+    int k =8;
+    max(j,k);// COMPILER ERROR! call to max is ambiguous
+    
+    return 0;
+}
+
+```
+
+
+#### Multi dimension array function parameter
+
+
+
+
 ### Forward declaration.
 
 A forward declaration allows us to tell the compiler about the existence of an identifier before actually defining the identifier.
 
 In the case of functions, this allows us to tell the compiler about the existence of a function before we define the function’s body. This way, when the compiler encounters a call to the function, it’ll understand that we’re making a function call, and can check to ensure we’re calling the function correctly, even if it doesn’t yet know how or where the function is defined.
+
+A forward declaration can have default values, definition can skip having default values.
 
 ```cpp
 #include <iostream>
@@ -391,6 +654,8 @@ Reference cannot be uninitialized,
 and reference cannot be made to refer/alias anything else once created.
 https://isocpp.org/wiki/faq/references
 
+Because there is no way to rebind a reference, references must always be initialized.
+
 An alias (an alternate name) for an object.
 The address of a reference is the actual object's address
 References are kind of like const pointers but not exactly.
@@ -465,7 +730,7 @@ e.g.
 //Instead of changing ref to reference variable v2, it assigns the value of v2 to v1
 ```
 
-#### const references
+#### const references (also known as reference to const typeX)
 
 A reference to a const value is often called a const reference for short.
 
@@ -478,9 +743,25 @@ YOu can declare const ref to a non-const value but not the other way:
     const int c2 = 3;
     int& cr2 {c2};// compiler error because cr2 can change things
 
-    // also works with r-value in constructor
+    // also works with r-value/temporaries in constructor
     const int& ref3{ 6 }; // okay, 6 is an r-value
 ```
+
+Another example:
+```cpp
+    int i = 42;// ok
+    const int &r1 = i;// ok
+    const int &r2 = 42;// ok
+    const int &r3 = r1 * 2;// ok
+    int& r4 = r1 * 2;// Error: Non-const lvalue reference to type 'int' cannot bind to a temporary of type 'int'
+    int& r5 = r1;// Error: Binding reference of type 'int' to value of type 'const int' drops 'const' qualifier
+```
+
+#### Why non-const ref cannot bind to temporaries but const references can ?
+https://stackoverflow.com/questions/1565600/how-come-a-non-const-reference-cannot-bind-to-a-temporary-object
+to protect people from changing the values of temporaries that are destroyed before their new value can be used
+you shouldn't try to modify temporaries for the very reason that they are temporary objects and will die any moment now.
+temporaries die at the end of the statement, unless they are bound to const reference, in which case they die when the reference goes out of scope
 
 #### references to const initialized via r-values, extend lifetime of r-values
 
@@ -729,7 +1010,221 @@ Unless you pass a reference of an object, pass by value happens
 and copy constructor is invoked on the function param side.
 
 Pass by reference to const, is an alternative choice, if function
-needs it for read only purposes and/or copy might be expensive
+needs it for read only purposes and/or copy might be expensive'
+
+### Returning references to local variables from functions is a bad practice, similarly returning pointers to local vars is bad practice
+
+function local vars are allocated on stack and typically do not live longer than the duration of the function call.
+
+Can result in a crash:
+```cpp
+// warning:: Reference to stack memory associated with local variable 'result' returned
+int& sum (int a, int b) {
+    int result = a+b;
+    return result;
+}
+```
+
+
+### consteval vs constexpr
+
+`consteval` creates a so-called immediate function. Each invocation of an immediate function creates a compile-time constant. To say it more directly. A consteval (immediate) function is executed at compile-time.
+```cpp
+#include <iostream>
+
+consteval int sqr(int n) {
+    return n * n;
+}
+
+int main() {
+    std::cout << "sqr(5): " << sqr(5) << std::endl;     // (1)
+    const int a = 5;                                    // (2)
+    std::cout << "sqr(a): " << sqr(a) << std::endl;     
+    int b = 5;                                          // (3)
+    // std::cout << "sqr(b): " << sqr(b) << std::endl; ERROR
+}
+```
+
+consteval cannot be applied to destructors or functions which allocate or deallocate
+`consteval` - It declares immediate functions, that is, functions that must be evaluated at compile time to produce a constant. 
+(It used to be spelled constexpr! in a previous revision of the paper.) 
+In contrast, `constexpr` functions may be evaluated at compile time or run time, and need not produce a constant in all cases.
+
+`constinit` - constinit can be applied to variables with static storage duration or thread storage duration.
+
+
+### const member functions
+
+A member function that inspects, rather than mutating its object
+Member functions with a const suffix are called “const member functions” or “inspectors.” Member functions without a const suffix are called “non-const member functions” or “mutators.”
+
+
+```cpp
+class Fred {
+public:
+  void inspect() const;   // This member promises NOT to change *this
+  void mutate();          // This member function might change *this
+};
+void userCode(Fred& changeable, const Fred& unchangeable)
+{
+  changeable.inspect();   // Okay: doesn't change a changeable object
+  changeable.mutate();    // Okay: changes a changeable object
+  unchangeable.inspect(); // Okay: doesn't change an unchangeable object
+  unchangeable.mutate();  // ERROR: attempt to change unchangeable object
+}
+```
+
+### What do “X const& x” and “X const* p” mean?
+It is just a writing style, but essentially the same as below:
+`X const& x` is equivalent to `const X& x`, and `X const* x` is equivalent to `const X* x`.
+
+### Does “X& const x” make any sense?
+No. It is nonsense.
+“x is a const reference to a X”. But that is redundant — references are always const, in the sense that you can never reseat a reference to make it refer to a different object. Never. With or without the const.
+
+In other words, `X& const x` is functionally equivalent to `X& x`
+
+
+### Implicit const promotion
+
+The compiler is free to add "const"ness (implicitly promote)
+for an object to satisfy expression, `but it cannot take it away`.
+
+pointers case:
+```cpp
+int d = 1;
+int *p1 = &d;
+const int* p2 = p1; // implicit promotion to const
+int *p3 = p2; // demotion to non-const not possible, exact error: Cannot initialize a variable of type 'int *' p3 with an lvalue of type 'const int *' p2
+```
+
+references case:
+
+
+### const initialization
+
+You must instantiate/define const, if non extern, default unitialized is not allowed.
+following is invalid:
+```cpp
+int main( ){
+    const int jj;// Error: Default initialization of an object of const type 'const int'
+    jj = 0;// Error: Cannot assign to variable 'jj' with const-qualified type 'const int'
+    extern const int ii; //Ok:  this is fine
+    return 0;
+}
+```
+
+### Const overloading
+
+const overloading is when you have an inspector method and a mutator method with the same name and the same number of and types of parameters. 
+The two distinct methods differ only in that the inspector is const and the mutator is non-const.
+
+```cpp
+class Fred { /*...*/ };
+class MyFredList {
+public:
+  const Fred& operator[] (unsigned index) const;  // Subscript operators often come in pairs
+  Fred&       operator[] (unsigned index);        // Subscript operators often come in pairs
+  // ...
+};
+
+void f(MyFredList& a)  // The MyFredList is non-const
+{
+  // Okay to call methods that inspect (look but not mutate/change) the Fred at a[3]:
+  Fred x = a[3];       // Doesn't change to the Fred at a[3]: merely makes a copy of that Fred
+  a[3].inspect();      // Doesn't change to the Fred at a[3]: inspect() const is an inspector-method
+  // Okay to call methods that DO change the Fred at a[3]:
+  Fred y;
+  a[3] = y;            // Changes the Fred at a[3]
+  a[3].mutate();       // Changes the Fred at a[3]: mutate() is a mutator-method
+}
+
+void f(const MyFredList& a)  // The MyFredList is const
+{
+  // Okay to call methods that DON'T change the Fred at a[3]:
+  Fred x = a[3];
+  a[3].inspect();
+
+  // Compile-time error (fortunately!) if you try to mutate/change the Fred at a[3]:
+  Fred y;
+  a[3] = y;       // Fortunately(!) the compiler catches this error at compile-time
+  a[3].mutate();  // Fortunately(!) the compiler catches this error at compile-time
+}
+
+```
+The const subscript operator returns a const-reference, so the compiler will prevent callers from inadvertently mutating/changing the Fred. The non-const subscript operator returns a non-const reference, which is your way of telling your callers (and the compiler) that your callers are allowed to modify the Fred object.
+
+When a user of your MyFredList class calls the subscript operator, the compiler selects which overload to call based on the constness of their MyFredList. If the caller has a `MyFredList a` or `MyFredList& a`, then `a[3]` will call the non-const subscript operator, and the caller will end up with a non-const reference to a Fred:
+
+
+### void pointers can hold any pointers
+
+void pointers can hold pointers of any type. 
+Generally we use void* to treat memory as opaque memory.
+also the type of data at void pointers is not known:
+Note:
+1. you cannot dererference a void*, you must cast it to a type based pointer first.
+
+```cpp
+int main( ){
+    int* k;
+    int j = 1;
+    double d = 0.01;
+    k = &j;
+    void* ad = k;// void* holding an int*
+    ad = &d;// not it holding a double*
+
+    std::cout << *ad << std::endl;// Error! cannot dereference a void *
+    double *dd = (double *)ad;// cast to a typed pointer first so it can be dereferenced
+    std::cout << *dd << std::endl;// Ok
+    return 0;
+}
+```
+
+### declarations
+
+https://en.cppreference.com/w/cpp/language/declarations
+
+Variable Declarations in c++ will usually have
+1. type specifier (int/classn name etc)
+2. declarator (identifier of the variable)
+3. (optional) initializer
+
+
+### Viewing clang AST
+
+c++ grammar: https://alx71hub.github.io/hcb/#basic.link
+
+Many important AST nodes derive from `Type`, `Decl` - declarations, `DeclContext` or `Stmt` - statement, with some classes deriving from both `Decl` and `DeclContext`
+
+
+
+```cpp
+$ cat test.cc
+int f(int x) {
+  int result = (x / 42);
+  return result;
+}
+
+# Clang by default is a frontend for many tools; -Xclang is used to pass
+# options directly to the C++ frontend.
+$ clang -Xclang -ast-dump -fsyntax-only test.cc
+TranslationUnitDecl 0x5aea0d0 <<invalid sloc>>
+... cutting out internal declarations of clang ...
+`-FunctionDecl 0x5aeab50 <test.cc:1:1, line:4:1> f 'int (int)'
+  |-ParmVarDecl 0x5aeaa90 <line:1:7, col:11> x 'int'
+  `-CompoundStmt 0x5aead88 <col:14, line:4:1>
+    |-DeclStmt 0x5aead10 <line:2:3, col:24>
+    | `-VarDecl 0x5aeac10 <col:3, col:23> result 'int'
+    |   `-ParenExpr 0x5aeacf0 <col:16, col:23> 'int'
+    |     `-BinaryOperator 0x5aeacc8 <col:17, col:21> 'int' '/'
+    |       |-ImplicitCastExpr 0x5aeacb0 <col:17> 'int' <LValueToRValue>
+    |       | `-DeclRefExpr 0x5aeac68 <col:17> 'int' lvalue ParmVar 0x5aeaa90 'x' 'int'
+    |       `-IntegerLiteral 0x5aeac90 <col:21> 'int' 42
+    `-ReturnStmt 0x5aead68 <line:3:3, col:10>
+      `-ImplicitCastExpr 0x5aead50 <col:10> 'int' <LValueToRValue>
+        `-DeclRefExpr 0x5aead28 <col:10> 'int' lvalue Var 0x5aeac10 'result' 'int'
+```
 
 ### A reference/pointer to const may refer to an object that is not const
 

@@ -22,3 +22,15 @@ The global std::getline() function works with C++ std::string objects (more conv
 
 The istream::getline() methods work with "classic" C strings (pointers to char).
 
+
+### reading input for custom classes
+
+Input streams use the extraction (>>) operator for the standard types. You can write similar extraction operators for your own types; your success depends on using white space precisely.
+
+```cpp
+istream& operator>> (istream& is, Date& dt)
+{
+    is>> dt.mo>> dt.da>> dt.yr;
+    return is;
+}
+```
