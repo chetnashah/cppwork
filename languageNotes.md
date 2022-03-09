@@ -1,9 +1,16 @@
 
-`size_t` is `unsinged`.
 
 global variables are initialized even before the main functions run.
 
 
+### size_t
+
+`size_t` is `unsinged`.
+
+the largest value `size_t` can have is SIZE_MAX (2^32 or 2^64 depending on architechture)
+defined in `stdint.h`
+
+return value of `sizeof` operator, which can typically return memory size of an object.
 ### static variables
 
 even though static variables might have larger storage duration then the function they are declared in,
@@ -26,10 +33,26 @@ In the rest of the cases, objects are allocated on stack.
 Start and end with `__` e.g. 
 `__func__` will return you name of the current function that is running.
 
+### effective type
+
+Every object has an `effective type`, which determines which lvalue accesses are valid and which violate the strict aliasing rules.
+
+If the object was created by a declaration, 
+the declared type of that object is the object's effective type.
+
+e.g. `int k[10]`, here the effective type of k is `int[10]`
+
+
 
 ### sizeof operator
 
-`sizeof` on a array would return full size (no of elements * element size),
+Two use cases:
+1. `sizeof(type)` - Yields the size in bytes of the object representation of type.
+2. `sizeof expression` - Yields the size in bytes of the object representation of the type of expression, if that expression is evaluated.
+
+Both versions return a value of type `size_t`.
+
+`sizeof` on a array would return full size (no of elements * element size) because of object representation of the effective type `T[N]` is `T*N`,
 but on a decayed pointer or a pointer returns pointer size.
 
 ### std::size vs sizeof
