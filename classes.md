@@ -282,3 +282,16 @@ class M {
   friend class F;
 }
 ```
+
+### Member functions defined within classes are implicitly declared inline
+
+A function defined within a class definition is an inline function.
+
+An inline function or variable shall be defined in every translation unit in which it is odr-used and shall have exactly the same definition in every case.
+
+A member function may be defined  in its class definition, in which case it is an inline member function.
+
+This means they do not break `one-definition-rule`.
+and itss ok when they get copied in case of header files containing implementations
+of classes along with implementations of method definitions.
+

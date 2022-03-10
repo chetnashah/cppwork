@@ -10,7 +10,16 @@ Three types of declarations:
 2. enum class (scoped enum)
 3. enum struct (scoped enum)
 
-Enums can't be printed directly, need to be cast to an underlying type first - One of the design motivations behind enum classes is to prevent confusing implicit conversions to integral types. And this is one of the side effects of that design choice. Enum classes can't implicitly convert to something directly printable through std::cout
+e.g.
+```cpp
+enum class Gender{
+    Male, Female
+};
+
+// usage
+Gender g = Gender::Male;// Gender is the scope
+```
+Enums can't be printed directly, need to be cast to an underlying type first -**One of the design motivations behind enum classes is to prevent confusing implicit conversions to integral types**. And this is one of the side effects of that design choice. Enum classes can't implicitly convert to something directly printable through std::cout
 
 ### Changing the underlying type
 

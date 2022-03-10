@@ -126,6 +126,9 @@ implicit conversion of pointer types - not allowed e.g. double* cannot be conver
 
 ### uninintialized values
 
+In C and C++, local variables are not initialized by default. 
+Uninitialized variables can contain any value, and their use leads to undefined behavior
+
 A variable that has not been given a known value (usually through initialization or assignment) is called an uninitialized variable.
 
 Value of `uninitialized variables is undefined and implementation dependent`.
