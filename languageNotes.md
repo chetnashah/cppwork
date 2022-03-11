@@ -42,8 +42,22 @@ the declared type of that object is the object's effective type.
 
 e.g. `int k[10]`, here the effective type of k is `int[10]`
 
+### namespaces
 
+`namespace identifier { namespace-body }`
 
+Namespaces provide a method for preventing name conflicts in large projects.
+`C` does not have namespaces so `C` libs will have all functions starting with libname, e.g. `glfw_doSometh`, `glfw_doANothterthing` etc. to prevent name conflict for the toplevel functions and types.
+but `namespaces` are good feature of `c++` that will help avoid all this name clashing
+and extensively used with libraries.
+
+Symbols declared inside a namespace block are placed in a named scope that prevents them from being mistaken for identically-named symbols in other scopes.
+
+Multiple namespace blocks with the same name are allowed. All declarations within those blocks are declared in the named scope.
+
+Namespace definitions are only allowed at namespace scope, including the global scope.
+
+ If you put a class into a namespace, be sure to put all helper functions and operators into the same namespace too.
 ### sizeof operator
 
 Two use cases:
@@ -84,6 +98,26 @@ Note delete does not null out its operand, it instead frees memory pointed to by
 3. `new` and `delete` should be in pairs.
 
 4. check for `nullptr` using if before dereferencing pointer.
+
+### The interface principle
+
+The Interface Principle
+For a class X, all functions, including free functions, that both
+   (a) "mention" X, and
+   (b) are "supplied with" X
+are logically part of X, because they form part of the interface of X.
+e.g.
+```cpp
+     class X { /*...*/ };
+     /*...*/
+     void f( const X& );
+```
+
+Therefore both member and nonmember functions can be logically "part of" a  class. A member function is still more strongly related to a class than is a nonmember, however.
+
+In the Interface Principle, a useful way to interpret "supplied with" is "appears in the same header and/or namespace." If the function appears in the same header as the class, it is "part of" the class in terms of dependencies. If the function appears in the same namespace as the class, it is "part of" the class in terms of object use and name lookup.
+
+
 
 ### One definition rule
 
@@ -225,7 +259,7 @@ int *pp {parr};// parr decayed to a pointer pp, decaying because we lost size in
 
 #### passing arrays to functions
 
-Passing arrays to funtions decays the pointer at function definition side
+Passing arrays to funtions decays the pointer at function definition side, and does not copy the whole array. This behavior is inherited from C.
 
 ```cpp
 void arraytaker(std::string strArr[]) {// strArr is decayed into a pointer, even if there is a number in the square braces
@@ -240,6 +274,7 @@ Sizeof on array function parameter will return size of 'std::string *' (aka 'bas
 ```
 
 Hence recommended best practice: also pass array size as separate function parameter
+along with passing the array.
 
 Approach2: pass arrays by reference, so size and other info is retained i.e not decayed
 Here numbers should match with signature
