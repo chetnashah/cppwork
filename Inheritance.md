@@ -1,4 +1,7 @@
 
+**Inheritance of classes is private by default, you should make it public**
+
+https://www.youtube.com/watch?v=77eueMbWI0Y
 
 ### Classic example
 

@@ -295,3 +295,45 @@ This means they do not break `one-definition-rule`.
 and itss ok when they get copied in case of header files containing implementations
 of classes along with implementations of method definitions.
 
+
+### virtual functions
+
+A virtual function allows derived classes to replace the implementation provided by the base class. 
+
+The compiler makes sure the replacement is always called whenever the object in question is actually of the derived class, even if the object is accessed by a base pointer rather than a derived pointer
+
+### interfaces in c++ and pure virtual functions
+
+An `interface` is basically a collection of abstract methods, represented as a type to be used by other concrete implementations/classes.
+
+In c++, an interface can be made by making a class with `pure virtual functions` i.e. (Virtual functions with `=0`, i.e. no implementation).
+
+A `pure virtual function` is a function that must be overridden in a derived class and need not be defined.
+
+e.g.
+```cpp
+class Printable {// Printable interface
+public:
+	virtual std::string getPrintableName() = 0;// pure virtual functions make the class an interface
+};
+
+class Entity : public Printable {// concrete implementation
+public:
+	std::string getPrintableName() override { return "Entity"; }
+};
+
+void printSomething(Printable* p) {// interface type
+	std::cout << p->getPrintableName() << std::endl;
+}
+
+int main(){
+  Entity e = (Entity{});
+	std::cout << e.getPrintableName() << std::endl;
+	printSomething(&e);
+}
+```
+
+`Advantages`:
+1. you cannot directly instantiate a class with pure virtual functions, you need to instantiate a concrete implementor of a abstract-class with pure virtual functions
+
+2. any implementors cannot be instantiated unless they provide an implementation of the abstract method.
