@@ -345,6 +345,24 @@ int main(){
 
 ### auto and references
 
+`auto decays`:
+- Raw arrays convert to pointers
+```cpp
+const int arr[4] = {1,2,3,4};
+auto a = arr; // a has type const int*
+```
+- functions convert to function pointers
+- top level references are removed
+- top level const/volatile qualifiers are removed
+```cpp
+int i = 32;
+const int& r = i;
+auto v = r; // type of v is int, vs value is copied from r.
+```
+
+```cpp
+auto s = "hi"; // "hi" type is const char[3], but type of s is const char*
+```
 
 ```cpp
 int main(){
@@ -1334,3 +1352,9 @@ constexpr const int* q2 = nullptr; // q2 is a const pointer to const int
 
 ### decltype
 
+
+### Copy elision
+
+https://www.youtube.com/watch?v=fSB57PiXpRw
+https://www.youtube.com/watch?v=hA1WNtNyNbo
+C++17 - mandatory RVO and copy elision
