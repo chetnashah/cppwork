@@ -136,3 +136,60 @@ variables must be defined once, can be declared many times
 extern int i; // declaration only, definition elsewhere
 int j; // declaraiton and definition
 ```
+
+
+### initializer-list based constructors
+When a compiler sees an initializer list e.g. `MyIntArray arr{ 5, 4, 3, 2, 1 }; // initializer list`, it automatically converts it into an object of type `std::initializer_list`. Therefore, if we create a constructor that takes a `std::initializer_list` parameter, we can create objects using the initializer list as an input.
+
+`std::initializer_list` lives in the `<initializer_list>` header.
+
+
+Main usage:
+```cpp
+#include "Vector.h"
+
+int main()
+{
+	Vector v1{ 2,3,4,5};
+	std::cout << "SEcond element is : " << v1[1] << std::endl;
+}
+```
+
+```cpp
+#pragma once
+#include <initializer_list>
+//expose vector interface
+class Vector {
+public:
+	Vector(int s);
+	Vector(std::initializer_list<double> els);
+	double& operator[](int i);
+	int size();
+private:
+	int sz;
+	double* elem;
+};
+```
+Implementation:
+```cpp
+#include "Vector.h"
+
+Vector::Vector(int s) :elem {new double[s]}, sz{s} {}
+
+Vector::Vector(std::initializer_list<double> els)
+{
+	elem = new double[els.size()];
+	int j = 0;
+	for (const double* d = els.begin(); d != els.end(); ++d,j++) {
+		elem[j] = *d;
+	}
+}
+
+double& Vector::operator[](int i) {
+	return elem[i];
+}
+
+int Vector::size() {
+	return sz;
+}
+```

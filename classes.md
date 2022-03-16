@@ -7,6 +7,17 @@ If the definitions of D satisfy all these requirements, then the program shall b
 The requirements specified by paragraph 6 essentially state that that two definitions must be identical (not simply equivalent). Consequently, a definition introduced in two separate translation units by an #include directive generally will not violate the ODR because the definitions are identical in both translation units.
 
 
+### POD classes
+
+POD stands for `Plain old data` - it is a class without constructors, destructors and virtual member functions. 
+It is an aggregate class that contains only PODS as members, has no user defined destructor, no user-defined copy assignment operator and no nonstatic members of pointer-to-member type.
+
+a data type which is compatible with the equivalent data type in C in layout, initialization, and its ability to be copied with memcpy.
+
+Informally, the C++ compiler guarantees that there will be no "magic" going on in the structure: for example hidden pointers to vtables, offsets that get applied to the address when it is cast to other types (at least if the target's POD too), constructors, or destructors. Roughly speaking, a type is a POD when the only things in it are built-in types and combinations of them. The result is something that "acts like" a C type
+
+ it is all built-in data types (e.g. int, char, float, long, unsigned char, double, etc.) and all aggregation of POD data. Yes, it's a recursive definition.
+
 
 ### Classes vs structs
 
