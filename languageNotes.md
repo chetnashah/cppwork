@@ -2,6 +2,7 @@
 
 global variables are initialized even before the main functions run.
 
+https://hackingcpp.com/index.html
 
 ### size_t
 

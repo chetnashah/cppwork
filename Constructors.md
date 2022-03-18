@@ -4,6 +4,8 @@ Credit: Timur Doulmer for this image:
 ![init table](images/init_in_cpp17_table.png "Init table")
 
 
+Move semantics: https://www.youtube.com/watch?v=vLinb2fgkHk
+
 ### How to write a constructor ?
 
 1. access will usually be public, i.e. in public section
