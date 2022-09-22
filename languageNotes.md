@@ -135,6 +135,10 @@ This is exactly what happens when you put the definition of your class in a head
 
 https://stackoverflow.com/questions/4955159/is-is-a-good-practice-to-put-the-definition-of-c-classes-into-the-header-file
 
+### scope and linkage
+
+https://www.youtube.com/watch?v=0kgTuWkyorc
+
 ### implicit conversions
 
 When you pass data of a type different than what the function takes,
