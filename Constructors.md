@@ -6,6 +6,25 @@ Credit: Timur Doulmer for this image:
 
 Move semantics: https://www.youtube.com/watch?v=vLinb2fgkHk
 
+## User vs compiler declared constructors
+
+![table](images/uservscompilerdeclaredconstructors.png)
+
+`Note`: no `new` keyowrd is needed to construct on stack, `new` keyword is only needed to construct on heap and get a pointer.
+
+
+## Types of initialization invocations
+
+Depending on context, the initializer may invoke:
+
+1. Value/uniform initialization, e.g. `std::string s{};`
+2. Direct initialization, e.g. `std::string s("hello");`
+3. Copy initialization, e.g. `std::string s = "hello";`
+4. List initialization, e.g. `std::string s{'a', 'b', 'c'};`
+5. Aggregate initialization, e.g. `char a[3] = {'a', 'b'};`
+6. Reference initialization, e.g. `char& c = a[0];`
+
+
 ### How to write a constructor ?
 
 1. access will usually be public, i.e. in public section
@@ -42,7 +61,7 @@ Dummy dummy;// "Dummy Default constructor" called
 
 **Note**: 
 1. Only one default constructor is allowed.
-2. if no constructors are specified, compiler generates/adds a default constructor, but the default constructor will not do any initialization.
+2. if no other constructors are specified, compiler generates/adds a default constructor, but the default constructor will not do any initialization.
 3. default constructor is invalid, when only user defined non-default constructors are specified.
 
 Default constructors can be deleted by calling `ConstructorName() = delete`, to prevent users from constructing class instance.
@@ -118,7 +137,7 @@ int main(){
 
 A copy constructor of class T is a non-template constructor whose first parameter is `T&‍`, `const T&‍`, `volatile T&‍`, or `const volatile T&‍`, and either there are no other parameters, or the rest of the parameters all have default values.
 
-A copy constructor is a special type of constructor used to create a new object as a copy of an existing object.
+A copy constructor is a special type of constructor used to create a new object as a copy of an existing object. (possibly deep copy recommended).
 
 The copy constructor is called whenever an object is initialized (by direct-initialization or copy-initialization) from another object of the same type (unless overload resolution selects a better match or the call is elided), which includes
 
@@ -127,7 +146,13 @@ The copy constructor is called whenever an object is initialized (by direct-init
 3. `function return`: `return a;` inside a function such as `T f()`, where `a` is of type `T`, which has `no move constructor`.
 
 
-**Note**- If you do not provide a copy constructor for your classes, C++ will create a public copy constructor for you, which does a shallow mem cpy of members
+**Note**- If you do not provide a copy constructor for your classes, C++ will create a public copy constructor for you, which does a shallow mem cpy of members.
+
+#### copy constructor vs copy assignment operation
+
+a `T x = t` will invoke **copy constructor**, because `x` is being constructed for first time.
+a `x = t` will invoke **copy assignment operator** because `x` is already constructed.
+
 
 #### What does copy constructor signature look like
 ```cpp
@@ -339,3 +364,6 @@ X d{}; // 3rd constructor matches
 
 // X e; // not allowed because no default constructor available
 ```
+
+## Overload resolution of constructors
+
