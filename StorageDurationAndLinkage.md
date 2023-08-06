@@ -20,7 +20,7 @@
 
 ## Declaration vs Definition
 
-`Declaration`: It is a program statement that says to the compiler that, Here is a name and some attributes for an entity that is somewhere in the program. A declaration that does not define something is called a `non-defining declaration`, otherwise it would be called a `defining declaration`
+`Declaration`: It is a program statement that says to the compiler that, Here is a name and some attributes for an entity that is somewhere in the program. A declaration that does not define something is called a `non-defining declaration`, otherwise it would be called a `defining declaration`. A non-defining declaration does not allocate storage for an object/entity.
 
 e.g. 
 ```cpp
@@ -29,6 +29,7 @@ int abs(int v);
 ```
 
 `Definition`: It is a declaration that says - here is a name and complete set of attributes for an entity that is right here. So all definitions are declarations
+An object definition allocates storage for an object/entity.
 
 e.g.
 ```cpp
@@ -37,6 +38,15 @@ int abs(int v) {
     return v < 0 ? -v : v;
 }
 ```
+
+
+## What is a non-defining object declaration?
+
+It has an `extern` keyword and no initializer.
+
+e.g. `extern int m` is a `non-defining object declaration`.
+
+Where as `int m;` and `extern int m = 10;` are both defining declarations.
 
 
 ## Translation units
@@ -102,3 +112,25 @@ A `name` stays in symbol table as long it is in scope.
 ### So how do two translation units refer to the same entity?
 
 **Using external linkage** - 
+
+
+## Storage class specifiers
+
+
+### IN C
+
+1. static
+2. extern
+3. auto - not in c++
+4. register - not in c++
+5. typedef - is a storage class for syntactic convinience.
+6. thread_local
+
+### IN C++
+
+1. extern
+2. mutable
+3. static
+4. thread_local
+
+
