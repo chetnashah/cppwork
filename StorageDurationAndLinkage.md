@@ -1,0 +1,104 @@
+
+## Entities (that we declare using names)
+
+1. functions
+2. types
+3. objects
+4. constants
+5. namespaces
+6. templates
+
+
+## Declaretion name attributes
+
+1. type
+2. scope
+3. storage duration
+4. linkage
+
+![nameattributes](./images/nameattributes.png)
+
+## Declaration vs Definition
+
+`Declaration`: It is a program statement that says to the compiler that, Here is a name and some attributes for an entity that is somewhere in the program. A declaration that does not define something is called a `non-defining declaration`, otherwise it would be called a `defining declaration`
+
+e.g. 
+```cpp
+// function declaration (non-defining declaration)
+int abs(int v);
+```
+
+`Definition`: It is a declaration that says - here is a name and complete set of attributes for an entity that is right here. So all definitions are declarations
+
+e.g.
+```cpp
+// function definition
+int abs(int v) {
+    return v < 0 ? -v : v;
+}
+```
+
+
+## Translation units
+
+Rules about scope and linkage are specified around Translation units (`.i` files - files that are preprocessed), not around headers and sources.
+
+### Translation units and object modules
+
+Compiler turns a translation unit into a `.o` object file or object module.
+There is 1-to-1 correspondence between a `.i` -> `.o` file.
+
+### Linker combines object files to create executable
+
+
+## Contents of object files
+
+Mainly contains two things:
+1. `data` - actual executable program/code, i.e. machine instructions and values/constants with associated storage. Program sections like `text`, `data`, `bss`, `literal`, `debug`, `comment` etc.
+2. `metadata` - metadata used by linker to manage creating the executable
+
+### Object file metadata
+
+**function names and addresses** and **object names and addresses** end up as metadata via `refs`(non-defining declarations) and `defs`(definitions) 
+
+
+## Symbol table
+
+It is internal data structure managed by the compiler to note:
+1. name of entities
+2. attributes of corresponding entities.
+
+**Usually symbol table is updated whenever a declaration is introduced or a definition is seen.**
+
+`name lookup` - whenever compiler encounters a reference to already declared entity, it references into the symbol table to get the attributes of the entity.
+
+### What is scope?
+
+ **A scope is a region of text in a single translation unit**. e.g. a function region or a class region or a namespace region or a file region.
+
+### Symbol table and scope
+
+A `name` stays in symbol table as long it is in scope.
+
+
+### Scope regions in C
+
+1. file scope
+2. block scope - e.g. function scope
+
+### Scope regions
+
+1. file scope = global scope (It is a special case of namespace scope). Global scope is treated as just another namespace.
+2. block scope = local scope
+3. **class (struct/union included) scope** - scope of a class member
+4. **namespace scope** - scope of a namespace member
+
+
+
+## Scope vs linkage
+
+**Scope only applies to one transalation unit** - global scope does not span translation units. 
+
+### So how do two translation units refer to the same entity?
+
+**Using external linkage** - 
