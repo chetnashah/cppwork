@@ -184,6 +184,8 @@ static int f(int); // make linkage internal, not visible in other Translation un
 
 This is what makes class members static - type level members instead of instance level.
 
+https://www.youtube.com/watch?v=f3FVU-iwNuA
+
 ### objects at file or namespace scope have external linkage & static storage by default
 
 ![namespacescopelinkagestorage](./images/namespacescopelinkagestorage.png)
