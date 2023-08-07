@@ -134,3 +134,59 @@ A `name` stays in symbol table as long it is in scope.
 4. thread_local
 
 
+## Storage duration
+
+Storage duration is the lifetime of the storage containing the object. It is not the lifetime of the object itself.
+
+**Storage duration only applies to objects**. It does not apply to functions, types, namespaces, templates.
+
+### Types of storage duration
+
+1. static - allocated on program startup and deallocated on program exit
+2. thread - allocated on thread startup and deallocated on program exit
+3. automatic - allocated on block start and deallocated on block exit
+4. dynamic - malloc/free or new/delete carved off the heap
+
+## Linkage
+
+### Types of linkage
+
+1. external linkage - same entity across all translation units.
+2. internal linkage - not available outside file/translation unit.
+3. no linkage - scope local variable have no linkage
+4. (In c++20) module linkage
+
+### What is external linkage?
+
+External linkage helps us specify same entity across all translation units.
+
+
+### Functions at namespace/file scope in C++ have external linkage by default
+
+### Class member functions also have external linkage by default
+
+```cpp
+class Widget {
+public:
+    void foo(); // foo has external linkage
+}
+```
+
+### Static on global functions changes linkage only
+
+`static` makes the linkage internal, but does not change the storage duration (since functions do not have storage duration).
+
+```cpp
+static int f(int); // make linkage internal, not visible in other Translation units
+```
+
+### static on class member functions does not affect linkage, but removes this.
+
+This is what makes class members static - type level members instead of instance level.
+
+### objects at file or namespace scope have external linkage & static storage by default
+
+![namespacescopelinkagestorage](./images/namespacescopelinkagestorage.png)
+
+### Storage duration specifiers
+
