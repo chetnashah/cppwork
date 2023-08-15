@@ -1,5 +1,28 @@
 
 
+## Generate build system (make or ninja files generation)
+
+More details here: https://cmake.org/cmake/help/latest/manual/cmake.1.html#generate-a-project-buildsystem
+```
+ cmake [<options>] -B <path-to-build> [-S <path-to-source>]
+```
+E.g..
+```
+git clone https://github.com/facebook/hermes.git
+cmake -S hermes -B build -G Ninja
+```
+
+## Running the build (Using --build)
+
+Then call that build system to actually compile/link the project:
+```
+ cmake --build <dir> [<options>] [-- <build-tool-options>]
+```
+e.g.
+```
+cmake --build .
+```
+
 ## Printing message
 
 ```cmake
