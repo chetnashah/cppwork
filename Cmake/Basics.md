@@ -14,6 +14,8 @@ cmake -S hermes -B build -G Ninja
 
 ## Running the build (Using --build)
 
+More details here: https://cmake.org/cmake/help/latest/manual/cmake.1.html#build-a-project
+
 Then call that build system to actually compile/link the project:
 ```
  cmake --build <dir> [<options>] [-- <build-tool-options>]
