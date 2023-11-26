@@ -13,6 +13,40 @@ Move semantics: https://www.youtube.com/watch?v=vLinb2fgkHk
 `Note`: no `new` keyowrd is needed to construct on stack, `new` keyword is only needed to construct on heap and get a pointer.
 
 
+## all constructors init example
+
+```cpp
+
+#include<iostream>
+#include<utility>
+
+struct S {
+    int x;
+
+    S(int new_x) : x(new_x) {
+        std::cout << "S(int new_x) constructor called" << std::endl;
+    }
+
+    // copy constructors are declared by const reference
+    S(const S& some_s) : x(some_s.x) {
+        std::cout << "S(const int& new_x)  copy constructor called" << std::endl;
+    }
+
+    // move constructors are declared by rvalue reference
+    S(S&& moved_s) : x(moved_s.x) {
+        std::cout << "S(int&& new_x) move constructor called" << std::endl;
+    }
+};
+
+int main(){
+    S s1{1}; // invokes direct/universal constructor
+    S s2 = s1; // invokes copy constructor
+    S s3(std::move(s1)); // invokes move constructor
+    return 0;
+}
+```
+
+
 ## Types of initialization invocations
 
 Depending on context, the initializer may invoke:
@@ -366,4 +400,6 @@ X d{}; // 3rd constructor matches
 ```
 
 ## Overload resolution of constructors
+
+
 
