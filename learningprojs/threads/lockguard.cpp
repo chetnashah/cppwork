@@ -1,5 +1,6 @@
 
-// lock_guard is a RAII idiom for functions that take a lock and unlock it
+// lock_guard is a RAII idiom for functions that take a lock 
+// and unlock it at the end of the function.
 #include<mutex>
 #include<thread>
 #include<iostream>
