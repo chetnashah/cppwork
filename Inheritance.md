@@ -11,9 +11,7 @@ Base instantiation happens before derived constructor instantiation.
 C++ constructs derived classes in phases, starting with the most-base class (at the top of the inheritance tree) and finishing with the most-child class (at the bottom of the inheritance tree). As each class is constructed, the appropriate constructor from that class is called to initialize that part of the class.
 
 
-
 ```cpp
-
 #include <iostream>
 
 class Base
@@ -24,9 +22,8 @@ public:
     Base(int id=0)
         : m_id(id)
     {
-        std::cout << "Base\n";
+        std::cout << "Base Constructor\n";
     }
-
     int getId() const { return m_id; }
 };
 
@@ -34,10 +31,13 @@ class Derived: public Base
 {
 public:
     double m_cost {};
-    Derived(double cost=0.0)
+    // Implicit call is made to Base Constructor, 
+    // because it has a no-arg constructor/default 
+    // constructor/constructor with default values
+    Derived(double cost=0.0) 
         : m_cost(cost)
     {
-        std::cout << "Derived\n";
+        std::cout << "Derived Constructor\n";
     }
     double getCost() const { return m_cost; }
 };
@@ -45,10 +45,10 @@ public:
 int main()
 {
     std::cout << "Instantiating Base\n";
-    Base base;
+    Base base; // "Base Constructor" is printed
 
     std::cout << "Instantiating Derived\n";
-    Derived derived;
+    Derived derived; // "Base Constructor" is printed first, then "Derived Constructor
 
     return 0;
 }
