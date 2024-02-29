@@ -9,5 +9,7 @@ int main() {
   std::cout << "ctr = " << counter() << std::endl;
   std::cout << "ctr = " << counter() << std::endl;
 
+
+
   return 0;
 }
