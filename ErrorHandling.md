@@ -1,6 +1,40 @@
 
 https://isocpp.org/wiki/faq/exceptions
 
+https://www.youtube.com/watch?v=0ojB8c0xUd8
+
+## Unhandled exceptions do not do stack unwinding.
+
+Without a catch, i.e. unhnadled exceptions do not do stack unwinding.
+
+As a result:
+1. no destructor/resource cleanup happens
+2. program terminates/aborts via `std::terminate`
+
+A catch-all handler in `main` will probably guarantee that stack is going to unwind.
+
+## Catch by reference (catch by value creates unnecessary copy)
+
+```cpp
+try {
+    // code that may throw an exception
+}
+catch (const std::exception& e) {
+    // handle the exception
+}
+```
+
+catching exception by const reference - if you do not plan to modify exception:
+
+```cpp
+try {
+    // code that may throw an exception
+}
+catch (std::exception const& e) {
+    // handle the exception
+}
+```
+
 ## Stack unwinding during exception
 
 For example, if someone says throw Foo(), the stack will be unwound so all the stack frames between the
@@ -160,3 +194,5 @@ Example: Memory allocation failure.
 ```cpp
 throw std::bad_alloc();
 ```
+
+

@@ -2,7 +2,7 @@ Templates are lot more powerful than regular generics.
 
 ```cpp
 // this fn only gets created if it is used somewhere in the code
-template<typename T>
+template<typename T> // note typename is an extra keyword, class also works
 void Print(T value) {
     std::cout << value << std::endl;
 }
@@ -24,4 +24,8 @@ class SomeClass {
     // Use K in someway..
 }
 ```
+
+## class vs typename
+
+In summary, both class and typename can be used to declare template parameters in C++ templates, but typename is often preferred for clarity, especially when dealing with nested types or dependent names.
 

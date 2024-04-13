@@ -1,6 +1,10 @@
 
 lambdas are anonymous functions
 
+https://learn.microsoft.com/en-us/cpp/cpp/lambda-expressions-in-cpp?view=msvc-170&viewFallbackFrom=vs-2019
+
+ a function object is an instance of a class, for which the call operator ( operator`()` ) is overloaded. This means that a function object is an object that behaves like a function. The main difference between a function and a function object is: a function object is an object and can, therefore, have stated.
+
 ### core syntax
 
 ```cpp
@@ -160,5 +164,30 @@ int main() {
   std::cout << "ctr = " << counter() << std::endl; // 2
 
   return 0;
+}
+```
+
+## Use lambdas for complex initialization of const variables
+
+```cpp
+#include <iostream>
+#include <vector>
+int main() {
+    // inline const initialization using a immediate lambda
+    const std::vector<int> v = [] {
+        std::vector<int> v;
+        for (int i = 0; i < 10; ++i) {
+        v.push_back(i);
+        }
+        return v;
+    }();
+
+    const widget x = [&]{
+        widget val;                                // assume that widget has a default constructor
+        for (auto i = 2; i <= N; ++i) {            // this could be some
+            val += some_obj.do_something_with(i);  // arbitrarily long code
+        }                                          // needed to initialize x
+        return val;
+    }();
 }
 ```
