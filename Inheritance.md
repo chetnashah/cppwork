@@ -78,7 +78,7 @@ class Derived: public Base
 public:
     double m_cost {};
 
-    Derived(double cost=0.0, int id=0)
+    Derived(double cost=0.0, int id=0) // here we see initing both base and own members
         : Base{ id } // Call Base(int) constructor with value id!
         , m_cost{ cost }
     {
@@ -88,7 +88,10 @@ public:
 };
 ```
 
-### Re-using base functions
+### Re-using base functions with Base::fnName
+
+There is **no super keyword** like in some other programming languages (e.g., Java, Python, or JavaScript). Instead use `Base::fnName` to call a function from the base class.
+
 
 ```cpp
 class Base
@@ -134,6 +137,74 @@ int main()
 }
 ```
 
+## Changing base access level when inheriting Base 
 
-### Virtual functions
+```cpp
+class Base
+{
+public:
+    int m_value {};
 
+    Base(int value)
+        : m_value { value }
+    {
+    }
+};
+class Derived: private Base {/* ...*/}// treat Base members as private to outside world (main etc)
+class Derived: protected Base {/* ... */} // treat Base members as protected to outside world (main etc)
+class Derived: public Base {/* ... */} // treat Base members as-is to outside world (main etc)
+```
+
+![Inheritance model](./images/inheritancemodel.jpg)
+
+## virtual & override keyword
+
+**Virtual** comes into picture for **same named methods in class hierarchy for overriding**
+
+Usually when a method is called, the reference class's method is called.
+If that method is marked virtual, then the method in the most derived class is called.
+This is called dynamic dispatch.
+
+1. In the **parent class**, the method must be **marked virtual**
+2. In the **derived class**, the method must be **marked override** (optional but recommended for better checking)
+
+### Virtual destructors
+
+**Rule** - **If a class has a virtual function, or if you might plan to do dynamic dispatch/override, base class should have a virtual destructor.**
+
+If a class is intended to be used as a base class, it's generally recommended to declare its destructor as virtual.
+This ensures proper cleanup of derived class resources when deleting through a base class pointer.
+
+**But why?** - When a pointer to a base class goes out of scope, the base class destructor is called but the derived class destructor is not called, because baseclass did not have a virtual destructor. Ideally because the instance was Derived class Instance, derived class destructor should also be called.
+
+**Note** - Compiler generated destructors are not virtual!!
+
+```cpp
+#include <iostream>
+
+class Base
+{
+public:
+    Base() { std::cout << "Base class constructor" << std::endl; }
+    ~Base() { std::cout << "Base class destructor" << std::endl; }
+};
+
+class Derived : public Base
+{
+public:
+    Derived() { std::cout << "Derived class constructor" << std::endl; }
+    ~Derived() { std::cout << "Derived class destructor" << std::endl; }
+};
+
+void doSomething()
+{
+    std::unique_ptr<Base> instance = std::make_unique<Derived>();
+}// Base goes out of scope so only ~Base() destructor is called, to cleanup via ~Derived(), we must make `virtual ~Base()`
+
+
+int main()
+{
+    doSomething();
+    return 0;
+}
+```

@@ -12,6 +12,17 @@ private:
     int i;
 };
 
+class MovableClass
+{
+public:
+    MovableClass(std::unique_ptr<int> arg) : ptr(std::move(arg)){};
+    // MovableClass(const MovableClass &) = delete;
+    // MovableClass &operator=(const MovableClass &) = delete;
+
+private:
+    std::unique_ptr<int> ptr;
+};
+
 class NotCopyable
 {
 public:
@@ -51,8 +62,13 @@ int main()
     std::cout << "" << r.i << std::endl;
     std::cout << "" << r.s << std::endl;
 
-    B b{};
-    B b2 = b;
+    // B b{};
+    // B b2 = b;
+
+    std::unique_ptr<int> ptr = std::make_unique<int>(10);
+    MovableClass mc(std::move(ptr));
+
+    MovableClass mc2 = ptr;
 
     return 0;
     // NoDefaultCtor ndc; // Error: no default constructor

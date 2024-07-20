@@ -1,6 +1,24 @@
 
 Think of `=delete` as `=disabled`.
 
+**User declared** means you have defined it yourself in sourcefile, even if you have written `=default` or `=delete` in the source file.
+
+https://www.youtube.com/watch?v=ajRTADPXEko Good talk.
+
+## Rules table (Read from left to right i.e user declared -> compiler generated)
+
+![Rules table](./images/smfrulestable.png)
+
+### Rules in english and types
+
+![Rules in english and types](./images/smfrulesinenglish.png)
+
+![Rules in english and types](./images/smfruleswithtypes.png)
+
+### Rules hierarchy
+
+![Rules hierarchy](./images/smfruleshierarchy.png)
+
 ## Rule of 3
 
 If you happen to have to **define 1) descrutctor**, also define 2) copy constructor and 3) copy assignment operator.
@@ -122,7 +140,7 @@ Destructors are mostly concerned with instances, not static members (as static m
 
 The compiler always generates a copy constructor and copy assignment operator if:
 1. No user-defined copy constructor or copy assignment operator is provided.
-2. and if no move constructor or move assignment operator is provided. (If move operations are provided, then copy operations are implicitly deleted).
+2. and if **no move constructor or move assignment operator** is provided. (If move operations are provided, then copy operations are implicitly deleted).
 3. and if all base/data members can be copy constructed/copy assigned. (If any base/data member cannot be copy constructed/copy assigned, then copy operations are implicitly deleted - which is surprising).
 
 ### Behavior of the compiler generated copy constructor and copy assignment operator
@@ -178,12 +196,12 @@ int main(){
 
 The compiler always generates a move constructor and move assignment operator if:
 1. No user-defined move constructor or move assignment operator is provided.
-2. If no destructor and no copy operation is declared(i.e. If user defined destructor or copy operation is provided, then move operations are implicitly deleted).
+2. If **no destructor** and **no copy operation** is declared(i.e. If user defined destructor or copy operation is provided, then move operations are implicitly deleted).
 3. If all bases/data members can be copy or move constructed/assigned.
 
 ### Behavior of the compiler generated move constructor and move assignment operator
 
-1. Move constructor and move assignment operator are just memberwise move.
+1. Move constructor and move assignment operator are **just memberwise move**.
 
 ```cpp
 class Widget {
@@ -195,5 +213,113 @@ class Widget {
             p = std::move(other.p);
             return *this;
         }
+}
+```
+
+
+## Checking the status of special member functions using type traits
+
+```cpp
+#include <type_traits>
+#include <iostream>
+
+// Utility to check if a type T has a default constructor
+template <typename T>
+constexpr bool has_default_constructor() {
+    return std::is_default_constructible<T>::value;
+}
+
+// Utility to check if a type T has a deleted default constructor
+template <typename T>
+constexpr bool has_deleted_default_constructor() {
+    return !std::is_default_constructible<T>::value;
+}
+
+// Utility to check if a type T has a copy constructor
+template <typename T>
+constexpr bool has_copy_constructor() {
+    return std::is_copy_constructible<T>::value;
+}
+
+// Utility to check if a type T has a deleted copy constructor
+template <typename T>
+constexpr bool has_deleted_copy_constructor() {
+    return !std::is_copy_constructible<T>::value;
+}
+
+// Utility to check if a type T has a move constructor
+template <typename T>
+constexpr bool has_move_constructor() {
+    return std::is_move_constructible<T>::value;
+}
+
+// Utility to check if a type T has a deleted move constructor
+template <typename T>
+constexpr bool has_deleted_move_constructor() {
+    return !std::is_move_constructible<T>::value;
+}
+
+// Utility to check if a type T has a copy assignment operator
+template <typename T>
+constexpr bool has_copy_assignment_operator() {
+    return std::is_copy_assignable<T>::value;
+}
+
+// Utility to check if a type T has a deleted copy assignment operator
+template <typename T>
+constexpr bool has_deleted_copy_assignment_operator() {
+    return !std::is_copy_assignable<T>::value;
+}
+
+// Utility to check if a type T has a move assignment operator
+template <typename T>
+constexpr bool has_move_assignment_operator() {
+    return std::is_move_assignable<T>::value;
+}
+
+// Utility to check if a type T has a deleted move assignment operator
+template <typename T>
+constexpr bool has_deleted_move_assignment_operator() {
+    return !std::is_move_assignable<T>::value;
+}
+
+// Utility to check if a type T has a destructor
+template <typename T>
+constexpr bool has_destructor() {
+    return std::is_destructible<T>::value;
+}
+
+// Utility to check if a type T has a deleted destructor
+template <typename T>
+constexpr bool has_deleted_destructor() {
+    return !std::is_destructible<T>::value;
+}
+
+// Example class to test
+class Example {
+public:
+    Example() = default;
+    Example(const Example&) = delete;
+    Example(Example&&) = default;
+    Example& operator=(const Example&) = delete;
+    Example& operator=(Example&&) = default;
+    ~Example() = default;
+};
+
+int main() {
+    std::cout << "Example has default constructor: " << has_default_constructor<Example>() << "\n";
+    std::cout << "Example has deleted default constructor: " << has_deleted_default_constructor<Example>() << "\n";
+    std::cout << "Example has copy constructor: " << has_copy_constructor<Example>() << "\n";
+    std::cout << "Example has deleted copy constructor: " << has_deleted_copy_constructor<Example>() << "\n";
+    std::cout << "Example has move constructor: " << has_move_constructor<Example>() << "\n";
+    std::cout << "Example has deleted move constructor: " << has_deleted_move_constructor<Example>() << "\n";
+    std::cout << "Example has copy assignment operator: " << has_copy_assignment_operator<Example>() << "\n";
+    std::cout << "Example has deleted copy assignment operator: " << has_deleted_copy_assignment_operator<Example>() << "\n";
+    std::cout << "Example has move assignment operator: " << has_move_assignment_operator<Example>() << "\n";
+    std::cout << "Example has deleted move assignment operator: " << has_deleted_move_assignment_operator<Example>() << "\n";
+    std::cout << "Example has destructor: " << has_destructor<Example>() << "\n";
+    std::cout << "Example has deleted destructor: " << has_deleted_destructor<Example>() << "\n";
+
+    return 0;
 }
 ```
