@@ -191,3 +191,53 @@ int main() {
     }();
 }
 ```
+
+## Expansion insights
+
+
+### Capture by value
+
+```cpp
+#include <cstdio>
+int main()
+{
+  int j = 2;
+  	auto isEven = [=](int i)
+  {
+      printf("j = %d",j);
+    return (i % 2) == 0;
+  };
+}
+```
+
+Desugared version on cppinsights.io
+```cpp
+#include <cstdio>
+
+int main()
+{
+  int j = 2;
+    
+  class __lambda_6_18
+  {
+    public: 
+    inline /*constexpr */ bool operator()(int i) const
+    {
+      printf("j = %d", j);
+      return (i % 2) == 0;
+    }
+    
+    private: 
+    int j;
+    
+    public:
+    __lambda_6_18(int & _j)
+    : j{_j}
+    {}
+    
+  };
+  
+  __lambda_6_18 isEven = __lambda_6_18{j}; // capture init/copying happens on lambda declaration itself, not waiting till use
+  return 0;
+}
+```
