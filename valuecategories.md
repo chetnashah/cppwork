@@ -192,3 +192,158 @@ MyString a2 = std::move(apple); // move constructor called.
 MyString a3;
 a3 = std::move(a2); // move assignment called  
 ```
+
+## Universal references (Also known as forwarding reference)
+
+In C++, **a universal reference is a type of reference that can bind to any type of object, including lvalues and rvalues.** Universal references were introduced in C++11 as a way to improve the flexibility and expressiveness of the language.
+
+**What is a universal reference?**
+
+A universal reference is a reference that is declared using the syntax `T&&`, where `T` is a type parameter. The `&&` symbol is called the "forwarding operator". When a universal reference is used as a function parameter, it can bind to any type of object, including:
+
+Note - A universal has r-value like syntax, i.e. `&&`, but **type deduction** should also be involved i.e. `T&&`.
+
+* Lvalues (e.g., variables, references)
+* Rvalues (e.g., temporaries, literals)
+* Const and non-const objects
+* Volatile and non-volatile objects
+
+**How do universal references work?**
+
+When a universal reference is used as a function parameter, the type `T` is deduced by the compiler based on the type of the argument passed to the function. The type `T` can be any type, including a reference type.
+
+Here are some examples to illustrate how universal references work:
+
+**Example 1: Binding to an lvalue**
+```cpp
+template <typename T>
+void foo(T&& x) {
+    // x is an lvalue reference to an int
+}
+
+int x = 5;
+foo(x); // T is deduced to be int&
+```
+In this example, the universal reference `x` binds to the lvalue `x`, which is an `int` variable. The type `T` is deduced to be `int&`, which is an lvalue reference to an `int`.
+
+**Example 2: Binding to an rvalue**
+```cpp
+template <typename T>
+void foo(T&& x) {
+    // x is an rvalue reference to an int
+}
+
+foo(5); // T is deduced to be int
+```
+In this example, the universal reference `x` binds to the rvalue `5`, which is an `int` literal. The type `T` is deduced to be `int`, which is an rvalue type.
+
+**Example 3: Binding to a const object**
+```cpp
+template <typename T>
+void foo(T&& x) {
+    // x is a const lvalue reference to an int
+}
+
+const int x = 5;
+foo(x); // T is deduced to be const int&
+```
+In this example, the universal reference `x` binds to the const lvalue `x`, which is a `const int` variable. The type `T` is deduced to be `const int&`, which is a const lvalue reference to an `int`.
+
+**Example 4: Forwarding**
+
+Universal references can also be used to forward arguments to another function. This is useful when you want to preserve the original type and value category of the argument.
+```cpp
+template <typename T>
+void foo(T&& x) {
+    bar(std::forward<T>(x)); // forward x to bar
+}
+
+void bar(int& x) {
+    // x is an lvalue reference to an int
+}
+
+void bar(int&& x) {
+    // x is an rvalue reference to an int
+}
+
+int x = 5;
+foo(x); // calls bar(int&)
+foo(5); // calls bar(int&&)
+```
+In this example, the universal reference `x` is forwarded to the `bar` function using `std::forward`. The type `T` is deduced based on the type of the argument passed to `foo`, and the original type and value category of the argument are preserved when calling `bar`.
+
+**Conclusion**
+
+Universal references are a powerful feature in C++ that allow you to write flexible and expressive code. They can bind to any type of object, including lvalues and rvalues, const and non-const objects, and volatile and non-volatile objects. By using universal references, you can write functions that can handle a wide range of input types and value categories, making your code more generic and reusable.
+
+## Forwarding references
+
+Forwarding references are a type of reference in C++ that can be used to forward arguments to another function while preserving the original type and value category of the arguments. Here are some use cases and examples of forwarding references:
+
+**Use cases:**
+
+1. **Forwarding arguments to another function**: Forwarding references can be used to forward arguments to another function while preserving the original type and value category of the arguments.
+2. **Implementing move semantics**: Forwarding references can be used to implement move semantics, which can improve performance by avoiding unnecessary copies of objects.
+3. **Implementing perfect forwarding**: Forwarding references can be used to implement perfect forwarding, which ensures that the original type and value category of the arguments are preserved when forwarding them to another function.
+
+**Examples:**
+
+**Example 1: Forwarding arguments to another function**
+```cpp
+template <typename T>
+void foo(T&& x) {
+    bar(std::forward<T>(x)); // forward x to bar
+}
+
+void bar(int& x) {
+    // x is an lvalue reference to an int
+}
+
+void bar(int&& x) {
+    // x is an rvalue reference to an int
+}
+
+int x = 5;
+foo(x); // calls bar(int&)
+foo(5); // calls bar(int&&)
+```
+In this example, the `foo` function takes a forwarding reference `x` and forwards it to the `bar` function using `std::forward`. The `bar` function has two overloads, one for lvalue references and one for rvalue references. The `foo` function preserves the original type and value category of the argument `x` when forwarding it to `bar`.
+
+**Example 2: Implementing move semantics**
+```cpp
+class MyClass {
+public:
+    MyClass(MyClass&& other) noexcept {
+        // move constructor
+    }
+};
+
+template <typename T>
+void foo(T&& x) {
+    MyClass obj = std::forward<T>(x); // move construct obj from x
+}
+
+MyClass obj;
+foo(std::move(obj)); // move construct obj from x
+```
+In this example, the `foo` function takes a forwarding reference `x` and uses it to move construct an object of type `MyClass`. The `std::forward` function is used to preserve the original type and value category of the argument `x`, which is an rvalue reference in this case.
+
+**Example 3: Implementing perfect forwarding**
+```cpp
+template <typename T>
+void foo(T&& x) {
+    bar(std::forward<T>(x)); // forward x to bar
+}
+
+template <typename T>
+void bar(T&& x) {
+    // x is a forwarding reference
+}
+
+int x = 5;
+foo(x); // calls bar(int&)
+foo(5); // calls bar(int&&)
+```
+In this example, the `foo` function takes a forwarding reference `x` and forwards it to the `bar` function using `std::forward`. The `bar` function also takes a forwarding reference `x`, which preserves the original type and value category of the argument `x`. This is an example of perfect forwarding, where the original type and value category of the argument are preserved throughout the call chain.
+
+These are just a few examples of the use cases and examples of forwarding references in C++. Forwarding references are a powerful tool that can be used to write more efficient and expressive code, and are an important part of modern C++ programming.

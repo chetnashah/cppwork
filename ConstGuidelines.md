@@ -1,4 +1,84 @@
 
+## Const with types
+
+value of the variable cannot be changed after initialization.
+
+## Const with pointers (one level of indirection)
+
+- `const int* ptr` or `int const* ptr` - Pointer to constant integer. The integer value cannot be changed through the pointer, but the pointer itself can be changed.
+
+- `int* const ptr` - Constant pointer to integer. The pointer itself cannot be changed, but the integer value can be changed through the pointer.
+
+- `const int* const ptr` - Constant pointer to constant integer. Both the pointer and the integer value are constant.
+
+## const to protect parameters
+
+We can do automatic casting in functions to avoid changing the value of the parameter.
+
+```cpp
+void mysteryFunction(const string* someString)
+{
+    *someString = "Test";  // Will not compile
+}
+ 
+int main()
+{
+    string myString { "The string" };
+    mysteryFunction(&myString);  // &myString is a string*
+}
+```
+
+
+## const member functions
+
+**mark class member functions as const, preventing them from modifying data members of the class**, if class data member is `mutable`, const member function can modify it.
+
+```cpp
+export class AirlineTicket
+{
+    public:
+        double calculatePriceInDollars() const;
+ 
+        std::string getPassengerName() const;
+        void setPassengerName(std::string name);
+ 
+        int getNumberOfMiles() const;
+        void setNumberOfMiles(int miles);
+ 
+        bool hasEliteSuperRewardsStatus() const;
+        void setHasEliteSuperRewardsStatus(bool status);
+    private:
+        std::string m_passengerName { "Unknown Passenger" };
+        int m_numberOfMiles { 0 };
+        bool m_hasEliteSuperRewardsStatus { false };
+};
+ 
+std::string AirlineTicket::getPassengerName() const
+{
+    return m_passengerName;
+}
+// Other member functions omitted…
+```
+
+## References to const
+
+once a reference is initialized, it cant point to anything else.
+But its value can be changed, if it is not a reference to const.
+
+By having a reference-to-const, you get the best of both worlds: no copy is made, and the original variable cannot be changed.
+**Note** `referencet-to-const` does not affect constness of original variable which is being referred.
+
+```cpp
+int value = 5;
+int& ref2 = value;
+const int& ref = value; // ref is a reference to const int
+value = 6; // OK
+// ref = 7; // Error, cant use a reference to const to change the value of the original variable
+ref2 = 8; // OK
+```
+
+```cpp
+
 ## Guideline: Avoid const member variables in class
 
 The C++ Core Guidelines recommend avoiding `const` member variables for several reasons. Here are some key points:
