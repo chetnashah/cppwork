@@ -1,6 +1,8 @@
 
 ## Type alias declarations (via "using" keyword)
 
+**Always prefer type aliases over typedefs**. They are more readable and can be used with templates.
+
 ```cpp
 using alias_identifier = type;
 ```

@@ -241,3 +241,144 @@ int main()
   return 0;
 }
 ```
+
+## `this` capture in lambdas, captures the enlosing object
+
+By default, `this` is not captured in lambdas, it's capture needs to be specified explicitly or you will get an error.
+
+```cpp
+#include <iostream>
+
+struct MyStruct
+{
+    void Function()
+    {
+        auto f = [this]()
+        {
+            // capturing this and renaming this as self inside the lambda
+            auto &self = *this; // this is a pointer to obj
+            self.counter++;
+            std::cout << " counter inside lambda " << self.counter << std::endl;
+        };
+        f();
+        std::cout << " counter outside lambda " << counter << std::endl;
+    }
+    int counter{0};
+};
+
+int main()
+{
+    MyStruct instance;
+    instance.Function();
+    instance.Function();
+    instance.Function();
+    return 0;
+}
+```
+
+Or you can make `self` variable before making lambda like `auto &self = *this;` and use `self` inside lambda:
+```cpp
+class MyClass {
+public:
+    int value;
+
+    MyClass(int v) : value(v) {}
+
+    void printValue() const {
+        auto& self = *this; // Capture `this` as `self` before defining the lambda
+        auto lambda = [&self]() {
+            std::cout << "Value: " << self.value << std::endl;
+        };
+
+        lambda();
+    }
+};
+```
+
+### this capture in lambda
+
+Here, `*this` means the current object, and therefore `&(*this)` denotes a reference to the current object. Also, if a capture clause implicitly or explicitly captures this, conceptually, it captures `&(*this)`.
+
+credits to guide at - https://www.nextptr.com/tutorial/ta1430524603/capture-this-in-lambda-expression-timeline-of-change
+
+![this_capture_in_lambda](./images/thiscaptureinlambdas.png)
+
+## Generic lambdas
+
+Generic lambdas, introduced in C++14, are a powerful feature that allows lambdas to accept arguments of any type. This is achieved using the `auto` specifier in the parameter list. When combined with `auto&&`, generic lambdas become even more flexible, enabling perfect forwarding and allowing the lambda to handle both lvalues and rvalues efficiently.
+
+### Generic Lambdas
+
+A generic lambda is a lambda that can accept arguments of any type. This is achieved by using the `auto` specifier in the parameter list. Here's a simple example:
+
+```cpp
+auto add = [](auto a, auto b) {
+    return a + b;
+};
+```
+
+In this example, the lambda `add` can accept arguments of any type that supports the `+` operator. This makes the lambda highly reusable and flexible.
+
+### Type Safety
+
+Generic lambdas are type-safe because the type of the arguments is deduced at compile time. This means that any type mismatches or invalid operations will result in compile-time errors, rather than runtime errors.
+
+For example, consider the following lambda:
+
+```cpp
+auto print = [](auto value) {
+    std::cout << value << std::endl;
+};
+```
+
+If you pass an argument to `print` that cannot be streamed to `std::cout`, you will get a compile-time error. This ensures that the lambda is used correctly and helps catch potential bugs early in the development process.
+
+### `auto&&` and Perfect Forwarding
+
+Using `auto&&` in the parameter list of a generic lambda enables perfect forwarding. Perfect forwarding is a technique that allows the lambda to preserve the value category (lvalue or rvalue) of the arguments passed to it. This is important for several reasons:
+
+1. **Efficiency**: Perfect forwarding allows the lambda to avoid unnecessary copies or moves, which can improve performance.
+2. **Flexibility**: Perfect forwarding allows the lambda to accept both lvalues and rvalues, making it more versatile.
+3. **Compatibility**: Perfect forwarding allows the lambda to work with functions that require specific value categories, such as constructors that accept rvalue references.
+
+Here's an example that demonstrates perfect forwarding with a generic lambda:
+
+```cpp
+auto wrap = [](auto&& value) {
+    return [value = std::forward<decltype(value)>(value)]() mutable {
+        return value;
+    };
+};
+```
+
+In this example, the lambda `wrap` accepts an argument of any type and returns a new lambda that captures the argument by value. The `std::forward` function is used to preserve the value category of the argument.
+
+### Use Cases
+
+Generic lambdas with `auto&&` have many use cases. Here are a few examples:
+
+1. **Utility Functions**: Generic lambdas can be used to create utility functions that work with any type. For example, a lambda that applies a function to a range of values can be implemented as a generic lambda.
+
+```cpp
+auto apply = [](auto&& func, auto&& range) {
+    for (auto&& value : range) {
+        func(value);
+    }
+};
+```
+
+2. **Visitors**: Generic lambdas can be used to implement the visitor pattern, which allows different behavior based on the type of the argument. The example you provided earlier demonstrates this use case.
+
+3. **Wrappers**: Generic lambdas can be used to create wrappers around other functions or lambdas, adding additional behavior or modifying the input or output. The `wrap` example above demonstrates this use case.
+
+4. **Callbacks**: Generic lambdas can be used as callbacks in algorithms or asynchronous operations, allowing the callback to handle any type of input.
+
+```cpp
+auto async_operation = [](auto&& callback) {
+    // Perform some asynchronous operation
+    auto result = perform_operation();
+    callback(result);
+};
+```
+
+In conclusion, generic lambdas with `auto&&` are a powerful feature in modern C++ that provide type safety, efficiency, and flexibility. They have many use cases and can help make code more reusable, maintainable, and expressive.

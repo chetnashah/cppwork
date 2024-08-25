@@ -77,7 +77,21 @@ value = 6; // OK
 ref2 = 8; // OK
 ```
 
+## const and `auto`
+
+**auto** always strips away **reference** and **const** qualifiers and thus results in a copy!
+
+If you don't want a copy, use `auto&` or `const auto&`.
+
+### Use `decltype` instead of auto to preserve constness
+
 ```cpp
+const int x = 5;
+auto y = x; // y is an int, not a const int
+decltype(x) z = x; // z is a const int
+```
+
+
 
 ## Guideline: Avoid const member variables in class
 
