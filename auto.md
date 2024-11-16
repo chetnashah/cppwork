@@ -4,6 +4,24 @@
 
 **Best practice** - If you want a const reference, reapply the const qualifier and reference even when it’s not strictly necessary, as it makes your intent clear and helps prevent mistakes.
 
+## Hack to find out deduced type
+
+```cpp
+template <typename T>
+class TD; // Type displayer
+
+int main()
+{
+    const int k = 1;
+    auto a = k;
+    TD<decltype(a)> td; // TD<int> - deduced type is int
+
+    const int &kr = k;
+    auto& b = kr;
+    TD<decltype(b)> td2; // TD<const int&> - deduced type is const int&
+}
+```
+
 ### `auto` dropping const
 ```cpp
 void autodroppingconst()
