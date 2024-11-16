@@ -48,3 +48,6 @@ In C++, the `const` keyword is used to declare objects and variables as constant
    Declares `value` as a constant member variable of `MyClass`. It means that each instance of `MyClass` will have its own `value`, which cannot be modified after initialization.
 
 Using `const` helps in writing safer and more predictable code by preventing accidental modification of variables and ensuring that certain operations do not change the state of objects. It also helps in documenting the intent of code and allows compilers to perform optimizations.
+
+
+## top level and low level const

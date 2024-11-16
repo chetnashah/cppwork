@@ -89,3 +89,36 @@ int main() {
 - `std::remove_reference` is a type trait that strips reference qualifiers (both lvalue and rvalue references) from a type.
 - It is typically used in generic programming to work with the underlying type of a reference.
 - The `std::remove_reference_t` alias template is a shorthand for `typename std::remove_reference<T>::type`, making it more convenient to use in modern C++ code.
+
+## Checking if a variable is a reference
+
+
+
+`std::is_reference_v` is a template variable while `std::is_reference` is a template class (type trait). Here's the key difference:
+
+```cpp
+// Using is_reference_v (simpler)
+bool x = std::is_reference_v<int&>;  // true
+bool y = std::is_reference_v<int>;   // false
+
+// Using is_reference (more verbose)
+bool x = std::is_reference<int&>::value;  // true
+bool y = std::is_reference<int>::value;   // false
+
+// with a variable
+void autodroppingreference()
+{
+    int x = 1;
+    int &y = x;
+    auto a = y; // a is int (reference dropped), copied from y
+
+    if (std::is_reference_v<decltype(a)>) // using decltype to get the type of a
+        std::cout << "a is a reference" << std::endl;
+    else
+        std::cout << "a is not a reference" << std::endl;
+}
+```
+
+`std::is_reference_v` was introduced in C++17 as a convenience helper variable template. It's equivalent to using `std::is_reference<T>::value` but provides a more concise syntax.
+
+Would you like me to explain the code in more detail?
