@@ -69,7 +69,13 @@
     "string_view": "cpp",
     "typeinfo": "cpp",
     "unordered_map": "cpp",
-    "variant": "cpp"
+    "variant": "cpp",
+    "deque": "cpp",
+    "memory": "cpp",
+    "forward_list": "cpp",
+    "print": "cpp",
+    "queue": "cpp",
+    "stack": "cpp"
   },
   "C_Cpp_Runner.msvcBatchPath": "",
   "C_Cpp_Runner.useMsvc": false,
