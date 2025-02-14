@@ -1,4 +1,9 @@
 
+## All top level declarations have external linkage
+
+1. Any named declarations at top level have external linkage
+2. Any named declarations inside a anonymous namespace have internal linkage
+3. Any named declaration inside a named namespace also have a external linkage (accessible via scope::)
 
 ## Where
 

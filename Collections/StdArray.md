@@ -29,3 +29,43 @@ i.e.
 // type parameters specify element type and size
 std::array<int, 3> a = {1, 2, 3};.
 ```
+
+## why use std::array?
+
+std::array offers several advantages over C-style arrays:
+
+1. Size safety and bounds checking:
+```cpp
+int carr[3] = {1,2,3};
+carr[5] = 1;         // Undefined behavior, no bounds checking
+std::array<int,3> arr = {1,2,3};
+arr.at(5);          // Throws std::out_of_range exception
+```
+
+2. Size awareness and iterator support:
+```cpp
+std::array<int,3> arr = {1,2,3};
+auto size = arr.size();      // Knows its own size
+for(auto it = arr.begin(); it != arr.end(); ++it) {} // Iterator support
+```
+
+3. Safer function passing (no decay to pointer):
+```cpp
+void func(int arr[]);        // Decays to pointer, size information lost
+void func(std::array<int,3>& arr);  // Preserves size information
+```
+
+4. STL algorithm compatibility:
+```cpp
+std::array<int,3> arr = {3,1,2};
+std::sort(arr.begin(), arr.end());  // Works with STL algorithms
+```
+
+5. Container operations:
+```cpp
+std::array<int,3> arr1 = {1,2,3};
+std::array<int,3> arr2 = {4,5,6};
+arr1 = arr2;                // Safe array copying
+```
+
+Would you like me to elaborate on any of these points?
