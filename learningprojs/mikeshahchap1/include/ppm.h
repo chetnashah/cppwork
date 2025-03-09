@@ -19,7 +19,7 @@ public:
     void darken();
 
 private:
-    std::vector<pixel> mPixels;
+    std::vector<int> mPixels;
     int mWidth;
     int mHeight;
     int mMaxRange;

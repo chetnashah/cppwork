@@ -4,13 +4,13 @@
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 
 void test1() {
-    PPM ppm1 {"spritefight_ascii.ppm"};
+    PPM ppm1 {"../spritefight_ascii.ppm"};
     ppm1.darken();
     ppm1.savePPM("spritefight_darkened.ppm");
 }
 
 void test2() {
-    PPM ppm1 {"spritefight_ascii.ppm"};
+    PPM ppm1 {"../spritefight_ascii.ppm"};
     ppm1.lighten();
     ppm1.savePPM("spritefight_lightened.ppm");
 }

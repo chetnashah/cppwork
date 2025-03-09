@@ -4,6 +4,7 @@ project(mikeshahchap1)
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(mikeshahchap1 src/main.cpp src/ppm.cpp
-        include/pixel.h)
+        include/pixel.h
+        include/thread_guard.h)
 
 target_include_directories(mikeshahchap1 PRIVATE include)
