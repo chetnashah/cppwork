@@ -24,6 +24,35 @@ int main() {
 }
 ```
 
+## A thread must be marked for detatch or joining before destruction!!!
+
+One must mark a thread object for detatch or joining before it is destructed, otherwise
+the program is terminated with `std::terminate`.
+
+```cpp
+#include <thread>
+#include <iostream>
+#include <chrono>
+
+void runSomeThread()
+{
+    std::thread t([]()
+                  { std::cout << "Running thread t" << std::endl; });
+
+    // ERROR! as t goes out of scope and destructed,
+    // Bcoz we have not decided to detatch or join t,
+    // Alternative: move t via returning so that it is not destructed!
+}
+
+int main()
+{
+    runSomeThread();
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    return 0;
+}
+```
+
+Note: that you only have to make this decision before the std::thread object is destroyed—the thread itself may well have finished long before you join with it or detach it, and if you detach it, then if the thread is still running, it will continue to do so, and may continue running long after the std::thread object is destroyed.
 
 ## jThread
 
@@ -58,4 +87,7 @@ then you can detach it by calling `t.detach()`.
 When you detach a thread, you essentially relinquish control and responsibility for managing that thread's resources.
 The thread will continue executing in the background until it completes. **You can no longer wait on a detached thread to finish.**
 
-```cpp
+## Manage local function memory used by thread
+
+Either copy your data for the thread, so it does not have to worry about scope based destruction,
+or join the thread before function exit, so thread has guaranteed acess to function scoped memory.
