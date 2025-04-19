@@ -77,12 +77,50 @@ int main() {
     return 0;
 }
 ```
+### Managing join for exceptions
 
+In general, if you were intending to call `join()` in a non-exceptional case, you also need to call `join()` in the presence of an exception to avoid accidental lifetime problems.
+Because if you forget joining and thread object destructs, it will terminate the app!
+
+#### Prefer RAII for managing joining in case of exceptions
+
+```cpp
+class thread_guard
+{
+    std::thread& t;
+public:
+    explicit thread_guard(std::thread& t_): // pass by reference - neither moved nor copied!
+        t(t_)
+    {}
+    ~thread_guard()
+    {
+        // Destructor always runs, even if exceptions are thrown
+        if(t.joinable())
+        {
+            t.join();
+        }
+    }
+    // remove copy ops, we are just movable only
+    thread_guard(thread_guard const&)=delete;
+    thread_guard& operator=(thread_guard const&)=delete;
+};
+struct func;          1
+void f()
+{
+    int some_local_state=0;
+    func my_func(some_local_state);
+    std::thread t(my_func);
+    thread_guard g(t);
+    do_something_in_current_thread();
+}
+```
 
 ## Thread Detaching
 
 You can detach a thread by calling `detach()` on it. e.g. if a thread t is created,
 then you can detach it by calling `t.detach()`.
+
+**Calling `detach()` on a `std::thread` object leaves the thread to run in the background, with no direct means of communicating with it**
 
 When you detach a thread, you essentially relinquish control and responsibility for managing that thread's resources.
 The thread will continue executing in the background until it completes. **You can no longer wait on a detached thread to finish.**
