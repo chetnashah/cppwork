@@ -43,6 +43,14 @@ int main() {
 }
 ```
 
+## How to check if a std lib class is movable?
+
+Check for move assignment operators and constructors in cppreference.com. 
+they should be visible as they are public.
+
+Common movable classes:
+1. 
+
 ## std::move summary
 
 1. Move semantics allows us to optimize the copying of objects, where we no longer need the value. It can beused implicitly (for unnamed temporary objects or local return values) or explicitly (with std::move()).
@@ -55,6 +63,25 @@ value.
 with std::move().
 6. Calling std::move() for a const object usually has no effect.
 7. If you return by value (not by reference), do not declare the return value as a whole to be const.
+
+## If argument is pass by value, but caller has called std::move, move happens automatically
+
+**A function declared to take argument by value will use move semantics and steal it from the caller if caller intended to move it**.
+
+```cpp
+// str is moved here if std::move or temp is passed at call site
+void fooByVal(std::string str) {
+    std::cout << str << std::endl;
+}
+
+void checkMoveByVal() {
+    std::string s{"Hello"};
+    std::cout << "checkMoveByVal 1: s = "<< s << std::endl;
+    fooByVal(std::move(s));
+    // s is empty after the move
+    std::cout << "checkMoveByVal 2:: s = " << s << std::endl; // empty ""
+}
+```
 
 ## Q: why do move constructors need to have non-const rvalue references?
 

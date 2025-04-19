@@ -3,4 +3,6 @@ project(cppmove)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(cppmove main.cpp)
+add_executable(cppmove main.cpp
+        customer.h
+        Shapes.h)

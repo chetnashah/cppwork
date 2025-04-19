@@ -99,3 +99,14 @@ int main()
     dr.Base::f(); // prints "base"
 }
 ```
+
+## Function passing strategies (based on move semantics)
+
+• “I only read, I don’t care about copy‐cost”: `const&` or `view`.
+• “I want my own copy”: by value.
+• “I want to mutate”: `&` or pointer.
+• “I want to steal”: value + move or `rvalue&`.
+• “I want perfect forwarding”: `template T&&`.
+• “I want to express ownership”: `unique_ptr`/`shared_ptr`.
+• “I need a nullable handle”: raw pointer or `optional<T&>` (C++23).
+
