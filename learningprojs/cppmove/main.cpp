@@ -1,5 +1,6 @@
 #include <iostream>
 #include<vector>
+#include <folly/FBString.h>
 
 #include "customer.h"
 // TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
@@ -62,6 +63,10 @@ int main() {
     workWithCustomer();
     std::cout << "=================" <<std::endl;
     makeACollectionOfCustomers();
+
+
+    folly::fbstring str = "Folly is working!";
+    std::cout << str << std::endl;
     return 0;
 }
 
