@@ -1,8 +1,9 @@
 #include <iostream>
 #include<vector>
-#include <folly/FBString.h>
-
+#include<string>
 #include "customer.h"
+using namespace std::string_literals;
+
 // TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 void validButUnspecifiedState() {
@@ -64,9 +65,11 @@ int main() {
     std::cout << "=================" <<std::endl;
     makeACollectionOfCustomers();
 
+    auto b = "asdfjk"; // b is const char*
+    auto c = "hey"s;// c is std::string, needs both <string> and "using namespace std::string_literals"
 
-    folly::fbstring str = "Folly is working!";
-    std::cout << str << std::endl;
+    // folly::fbstring str = "Folly is working!";
+    // std::cout << str << std::endl;
     return 0;
 }
 

@@ -8,6 +8,11 @@ Type for string literal is `const char *`
 The string object itself is stored on the stack but it points to memory that is on the heap.
 But there is an optimization, short string optimization where the data is inline, instead on the heap.
 
+```cpp
+auto b = "asdfjk"; // b is const char*
+auto c = "hey"s;// c is std::string, needs both <string> and "using namespace std::string_literals"
+```
+
 
 ### char array representation
 
