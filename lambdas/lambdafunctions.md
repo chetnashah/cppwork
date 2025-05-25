@@ -167,6 +167,35 @@ class Example {
 };
 ```
 
+## lambdas are const function objects
+
+Lambdas are const function objects by default, meaning they cannot modify captured variables unless they are marked as `mutable` which implicitly removes the constness of the lambda.
+
+**So if you want stateful lambdas, you need to use `mutable` keyword.** - e.g. a lambda that counts the number of times it has been called.
+
+```cpp
+#include<iostream>
+int main() {
+    // allows per lambda mutable state
+    // note: ctr is a member of the lambda object, which is copied when lambda is copied
+    auto countsCalls = [ctr=0]() mutable { return ++ctr; };
+    
+    // lambdas are copyable, different internal/mutable state
+    auto c1 = countsCalls;
+    c1();
+    c1();
+    std::cout << c1() << std::endl; // prints "3"
+
+    // copy of lambda, different internal/mutable state
+    auto c2 = countsCalls;
+    c2();
+    std::cout << c2() << std::endl; // prints "2"
+
+    return 0;
+}
+
+```
+
 ## Non-local lambda function cannot have a capture default
 
 The error message "non-local lambda expression cannot have a capture-default" typically occurs in C++ when you're trying to use a capture-default (= or &) in a lambda expression that is not local to a function.
@@ -371,11 +400,11 @@ credits to guide at - https://www.nextptr.com/tutorial/ta1430524603/capture-this
 
 ## Generic lambdas
 
-Generic lambdas, introduced in C++14, are a powerful feature that allows lambdas to accept arguments of any type. This is achieved using the `auto` specifier in the parameter list. When combined with `auto&&`, generic lambdas become even more flexible, enabling perfect forwarding and allowing the lambda to handle both lvalues and rvalues efficiently.
+Generic lambdas, introduced in C++14, are a powerful feature that allows lambdas to accept arguments of any type. **This is achieved using the `auto` specifier in the parameter list of the lambda.** When combined with `auto&&`, generic lambdas become even more flexible, enabling perfect forwarding and allowing the lambda to handle both lvalues and rvalues efficiently.
 
 ### Generic Lambdas
 
-A generic lambda is a lambda that can accept arguments of any type. This is achieved by using the `auto` specifier in the parameter list. Here's a simple example:
+**A generic lambda is a lambda that can accept arguments of any type. This is achieved by using the `auto` specifier in the parameter list.** Here's a simple example:
 
 ```cpp
 auto add = [](auto a, auto b) {
