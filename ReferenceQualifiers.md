@@ -24,10 +24,12 @@ public:
         std::cout << "Destructing " << name_ << std::endl;
     }
 
+    // Copy constructor
     MyData(const MyData& other) : name_(other.name_ + "_copy"), data_(other.data_) {
          std::cout << "Copy constructing " << name_ << std::endl;
     }
 
+    // Move constructor
     MyData(MyData&& other) noexcept : name_(std::move(other.name_) + "_moved"), data_(std::move(other.data_)) {
         std::cout << "Move constructing " << name_ << std::endl;
     }
