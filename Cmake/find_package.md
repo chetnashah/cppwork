@@ -6,9 +6,69 @@ CMake provides direct support for two forms of packages:
 1. Config-file Packages and 
 2. Find-module Packages
 
-Source
+*Thinking...*
 
-Now, what does that actually mean?
+> **Unveiling CMake Paths**
+> 
+> I'm now focusing on methods for extracting CMake's default search paths. Initially, I'll try to get CMake itself to print these paths directly. After that, I'll hunt for internal variables that hold the paths for packages, libraries, and executables. I'll also check the command line for any helpful options or scripts. I anticipate a clear picture emerging shortly.
+> 
+> 
+> **Exploring Path Retrieval Strategies**
+> 
+> I'm now delving deeper into direct approaches. My current focus is on using command-line options to directly obtain the path information from CMake. I'm examining the various flags available. If direct options fail, I'll explore the use of auxiliary scripts within CMake to reveal the underlying paths. I anticipate this phase will provide more concrete results.
+> 
+> 
+> **Unpacking CMake's Paths**
+> 
+> I've been digging into how CMake figures out its default search paths. It's clear that it's a multifaceted process. The `find_*` command, the OS, and various variables all play a role. I've begun to uncover the different factors at play, but there is a great deal more to explore.
+> 
+> 
+> **Charting the Search Orders**
+> 
+> I'm now structuring my response by breaking down the `find_*` commands individually. I'm delving deeper into the nuances, especially the distinction between Module and Config mode for `find_package`. I'll highlight the role of environment variables like `PATH` and how they influence the process. I am planning to include examples to illustrate the concepts, making it clearer for the user.
+> 
+> 
+> **Structuring the Response**
+> 
+> I've synthesized the research and have a clear plan. The structure will begin with an overview of CMake's search mechanisms and crucial variables. After that, I will provide a practical method for the user to see the paths, which is the most direct help. The following sections will detail the search orders for `find_package`, `find_library`, and `find_program`. I plan to add some code examples and clear headings for improved comprehension. I'm nearly done with the first draft.
+> 
+> 
+Determining the default paths used by CMake is a multi-faceted question because the search paths depend on the specific command being used (e.g., `find_package`, `find_library`, `find_program`), the operating system environment, and numerous CMake variables.
+
+Here is a comprehensive guide to understanding, printing, and controlling the default search paths in CMake.
+
+### The Most Direct Method: Debugging the `find` Commands
+
+The most effective way to see the exact paths CMake is searching for a specific `find_*` command is to use the debugging options introduced in CMake 3.17.
+
+You can enable this debugging output in two ways:
+
+1.  **Using the command-line option `--debug-find`**:
+    This will print detailed information for all `find_*` calls during the CMake run. [[1]](https://stackoverflow.com/questions/54293737/how-do-i-tell-cmake-to-output-the-package-search-paths)
+
+    ```bash
+    cmake --debug-find -S . -B build
+    ```
+
+2.  **Setting the `CMAKE_FIND_DEBUG_MODE` variable**:
+    You can set this variable in your `CMakeLists.txt` or pass it via the command line. This provides the same detailed output as the command-line flag. [[1]](https://stackoverflow.com/questions/54293737/how-do-i-tell-cmake-to-output-the-package-search-paths)
+
+    ```bash
+    # Pass via command line
+    cmake -DCMAKE_FIND_DEBUG_MODE=1 -S . -B build
+
+    # Or, set in CMakeLists.txt for temporary debugging
+    set(CMAKE_FIND_DEBUG_MODE 1)
+    find_package(MyPackage REQUIRED)
+    set(CMAKE_FIND_DEBUG_MODE 0) # Turn off when no longer needed
+    ```
+
+The output from these options will show you the exact locations being probed for the package or library you are trying to find, making it the most reliable way to debug path issues.
+
+---
+
+
+###
 
 `Find-module` packages are the ones you are probably most familiar with. They execute a script of CMake code (such as this one) that does a bunch of calls to functions like find_library and find_path to figure out where to locate a library.
 
