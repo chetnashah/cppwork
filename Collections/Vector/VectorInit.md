@@ -175,6 +175,7 @@ The best way to create a `Rows x Cols` matrix is by using the fill constructor. 
     int cols = 5;
     T initial_value = 0;
 
+    // NOTE: see how inner vector value is nameless
     std::vector<std::vector<T>> matrix(rows, std::vector<T>(cols, initial_value));
     ```
 
