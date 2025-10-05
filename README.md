@@ -33,3 +33,11 @@ When an array decays to a pointer, the size information is lost.
 
 This can lead to potential issues if the function that receives the pointer needs to know the size of the array for correct processing.
 
+## Statements
+
+Statements in C++ are instructions that perform actions. They can be simple or complex, and they are typically terminated by a semicolon (`;`). 
+
+## Declarations (introduce names)
+
+## Expressions (evaluate to values)
+
