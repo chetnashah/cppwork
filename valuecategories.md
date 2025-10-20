@@ -1,4 +1,8 @@
 
+## Every expression in c++ has a type and a value category
+
+value cateogry comes into picture when binding values to names (e.g. in function calls or variable assignments)
+
 ### delete nullptr is ok i.e. no-op
 
 
